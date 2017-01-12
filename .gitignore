@@ -3,4 +3,4 @@
 build
 app/build
 app/app.iml
-PopularMovies2.iml
+*.iml
