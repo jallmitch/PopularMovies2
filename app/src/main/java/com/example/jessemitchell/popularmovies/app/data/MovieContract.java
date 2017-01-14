@@ -78,8 +78,11 @@ public class MovieContract
 
         public static final String TABLE_NAME = "videos";
 
+        // API returns UUID string, storing as text
+        public static final String COLUMN_VIDEO_ID = "video_id";
+
         // Foreign Key to tie the videos to the movie
-        public static final String COLUMN_VIDEO_MOVIE_KEY = "movie_key";
+        public static final String COLUMN_MOVIE_KEY = "movie_key";
 
         // Name of the video
         public static final String COLUMN_VIDEO_NAME = "name";
