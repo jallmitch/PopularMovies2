@@ -35,6 +35,12 @@
                 android:value=".MainActivity"
                 />
         </activity>
+        <provider
+            android:authorities="com.example.jessemitchell.popularmovies.app"
+            android:name=".data.MovieProvider"
+            android:exported="false"
+            android:syncable="true"
+        />
     </application>
 
 </manifest>
