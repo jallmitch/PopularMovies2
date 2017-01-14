@@ -12,7 +12,7 @@ public class MovieDbHelper extends SQLiteOpenHelper
 {
 
     private static final int DATABASE_VERSION = 1;
-    static final String DATABASE_NAME = "movies.db";
+    public static final String DATABASE_NAME = "movies.db";
 
     public MovieDbHelper(Context context)
     {
@@ -42,7 +42,10 @@ public class MovieDbHelper extends SQLiteOpenHelper
                        MovieContract.VideoEntry.COLUMN_VIDEO_TYPE + " TEXT NOT NULL, " +
                        MovieContract.VideoEntry.COLUMN_VIDEO_SIZE + " INTEGER NOT NULL, " +
                  " FOREIGN KEY (" + MovieContract.VideoEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
-                MovieContract.MovieEntry.TABLE_NAME + " (" + MovieContract.MovieEntry._ID + ")";
+                MovieContract.MovieEntry.TABLE_NAME + " (" + MovieContract.MovieEntry._ID + "));";
+
+        db.execSQL(SQL_CREATE_MOVIE_TABLE);
+        db.execSQL(SQL_CREATE_VIDEO_TABLE);
     }
 
     @Override
