@@ -40,7 +40,7 @@ public class TestUtilities extends AndroidTestCase
         cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, MOVIE_TITLE);
         cv.put(MovieContract.MovieEntry.COLUMN_MOVIE__OVERVIEW, MOVIE_OVERVIEW);
         cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, MOVIE_RELEASE_DATE);
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER, MOVIE_POSTER_PATH);
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, MOVIE_POSTER_PATH);
         cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, MOVIE_VOTE_AVERAGE);
         cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE, MOVIE_LIST_TYPE);
 
@@ -58,7 +58,7 @@ public class TestUtilities extends AndroidTestCase
         cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_NAME, VIDEO_NAME);
         cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_SITE, VIDEO_SITE);
         cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_SIZE, VIDEO_SIZE);
-        cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_KEY, VIDEO_KEY);
+        cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_SITE_KEY, VIDEO_KEY);
         cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_TYPE, VIDEO_TYPE);
 
         db.insert(MovieContract.VideoEntry.TABLE_NAME,null,cv);

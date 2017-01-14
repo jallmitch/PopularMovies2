@@ -48,7 +48,7 @@ public class MovieContract
         public static final String COLUMN_MOVIE_RELEASE_DATE = "release_date";
 
         // API returns the image file name of the poster
-        public static final String COLUMN_MOVIE_POSTER = "poster_path";
+        public static final String COLUMN_MOVIE_POSTER_PATH = "poster_path";
 
         // Returned from the API as a float: Rating is on scale from 1-10
         public static final String COLUMN_MOVIE_VOTE_AVERAGE = "vote_average";
@@ -67,22 +67,13 @@ public class MovieContract
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_VIDEO).build();
 
-        // content://authority/movie - all movies
-        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" +
-                CONTENT_AUTHORITY + "/" +
-                PATH_VIDEO;
-
-        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" +
-                CONTENT_AUTHORITY + "/" +
-                PATH_VIDEO;
-
         public static final String TABLE_NAME = "videos";
 
         // API returns UUID string, storing as text
         public static final String COLUMN_VIDEO_ID = "video_id";
 
         // Foreign Key to tie the videos to the movie
-        public static final String COLUMN_MOVIE_KEY = "movie_key";
+        public static final String COLUMN_MOVIES_KEY = "movies_key";
 
         // Name of the video
         public static final String COLUMN_VIDEO_NAME = "name";
@@ -91,7 +82,7 @@ public class MovieContract
         public static final String COLUMN_VIDEO_SITE = "site";
 
         // API returns the key for the video, on the hosting site
-        public static final String COLUMN_VIDEO_KEY = "key";
+        public static final String COLUMN_VIDEO_SITE_KEY = "site_key";
 
         // API returns the size of the video: 720 | 1080
         public static final String COLUMN_VIDEO_SIZE = "size";

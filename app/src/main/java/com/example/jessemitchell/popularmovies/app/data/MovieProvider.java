@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 /**
@@ -14,11 +15,25 @@ import android.net.Uri;
 public class MovieProvider extends ContentProvider
 {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
+    private static final SQLiteQueryBuilder sMovieWithVideoQB;
     private MovieDbHelper mMovieDb;
 
     static final int MOVIES = 100;
     static final int MOVIE_WITH_DETAILS = 101;
     static final int VIDEO = 200;
+
+    static{
+        sMovieWithVideoQB = new SQLiteQueryBuilder();
+
+        sMovieWithVideoQB.setTables(
+                MovieContract.MovieEntry.TABLE_NAME +  " INNER JOIN " +
+                        MovieContract.VideoEntry.TABLE_NAME +
+                        " ON " + MovieContract.MovieEntry.TABLE_NAME +
+                        "." + MovieContract.MovieEntry._ID +
+                        "=" + MovieContract.VideoEntry.TABLE_NAME +
+                        "." + MovieContract.VideoEntry.COLUMN_MOVIES_KEY
+        );
+    }
 
     @Override
     public boolean onCreate()
@@ -32,28 +47,33 @@ public class MovieProvider extends ContentProvider
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MovieContract.CONTENT_AUTHORITY;
 
-
         // content://authority/movie - all movies
         matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIES);
         // content://authority/movie/id - specific movie with information
         matcher.addURI(authority, MovieContract.PATH_MOVIE + "/*", MOVIE_WITH_DETAILS);
-//        // content://authority/movie/id/video - all videos for a particular movie
-//        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/*" + MovieContract.PATH_VIDEO, MOVIE_WITH_VIDEOS);
-        // content://authority/video/id - specific video
-        matcher.addURI(authority, MovieContract.PATH_VIDEO + "/*", VIDEO);
 
         return matcher;
     }
 
     @Override
-    public String getType(Uri uri) {
-        return null;
+    public String getType(Uri uri)
+    {
+        final int matchUri = sUriMatcher.match(uri);
+
+        switch (matchUri)
+        {
+            case MOVIES:
+                return MovieContract.MovieEntry.CONTENT_TYPE;
+            case MOVIE_WITH_DETAILS:
+                return MovieContract.MovieEntry.CONTENT_ITEM_TYPE;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
     }
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder)
     {
-        SQLiteDatabase db = mMovieDb.getReadableDatabase();
         int matchedUri = sUriMatcher.match(uri);
         Cursor returnCursor;
 
@@ -61,21 +81,34 @@ public class MovieProvider extends ContentProvider
         {
             case MOVIES:
             {
-                break;
-            }
-            case VIDEO:
-            {
+                returnCursor = mMovieDb.getReadableDatabase()
+                                       .query(MovieContract.MovieEntry.TABLE_NAME,
+                                               projection,
+                                               selection,
+                                               selectionArgs,
+                                               null,
+                                               null,
+                                               null);
                 break;
             }
             case MOVIE_WITH_DETAILS:
             {
+                returnCursor = sMovieWithVideoQB.query(
+                        mMovieDb.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        null);
+
                 break;
             }
             default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
-
-        return null;
+        return returnCursor;
     }
 
     @Override
