@@ -85,16 +85,17 @@ public class TestUtilities extends AndroidTestCase
     }
 
     public static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
+
         Set<Map.Entry<String, Object>> valueSet = expectedValues.valueSet();
         for (Map.Entry<String, Object> entry : valueSet) {
             String columnName = entry.getKey();
             int idx = valueCursor.getColumnIndex(columnName);
             assertFalse("Column '" + columnName + "' not found. " + error, idx == -1);
             String expectedValue = entry.getValue().toString();
-            String valueEntered = valueCursor.getString(idx);
+            String actualValue = valueCursor.getString(idx);
             assertEquals("Value '" + entry.getValue().toString() +
                     "' did not match the expected value '" +
-                    expectedValue + "'. " + error, expectedValue, valueEntered);
+                    expectedValue + "'. " + error, expectedValue, actualValue);
         }
     }
 }
