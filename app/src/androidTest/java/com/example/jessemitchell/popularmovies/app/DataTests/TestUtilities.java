@@ -2,11 +2,15 @@ package com.example.jessemitchell.popularmovies.app.DataTests;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 
 import com.example.jessemitchell.popularmovies.app.data.MovieContract;
 import com.example.jessemitchell.popularmovies.app.data.MovieDbHelper;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by jesse.mitchell on 1/13/2017.
@@ -21,28 +25,22 @@ public class TestUtilities extends AndroidTestCase
     public static final String MOVIE_POSTER_PATH = "/WLQN5aiQG8wc9SeKwixW7pAR8K.jpg";
     public static final float MOVIE_VOTE_AVERAGE = 5.8f;
     public static final String MOVIE_LIST_TYPE = "FAVORITE";
-    public static  final int MOVIE_KEY = 328111;
+    public static  final long MOVIE_KEY = 328111;
 
     // Video Values
-    public static  final String VIDEO_ID = "";
-    public static  final String VIDEO_NAME = "";
-    public static  final String VIDEO_SITE = "";
-    public static  final String VIDEO_KEY = "";
-    public static  final String VIDEO_TYPE = "";
-    public static  final String VIDEO_SIZE = "";
+
+    public static  final String VIDEO_ID = "571cdc48c3a3684e620018b8";
+    public static  final String VIDEO_NAME = "Official Teaser Trailer";
+    public static  final String VIDEO_SITE = "YouTube";
+    public static  final String VIDEO_KEY = "i-80SGWfEjM";
+    public static  final String VIDEO_TYPE = "Trailer";
+    public static  final int VIDEO_SIZE = 1080;
 
     public static void buildMovieTable(Context context)
     {
         SQLiteDatabase db = new MovieDbHelper(context).getWritableDatabase();
 
-        ContentValues cv = new ContentValues();
-        cv.put(MovieContract.MovieEntry._ID, MOVIE_KEY);
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, MOVIE_TITLE);
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE__OVERVIEW, MOVIE_OVERVIEW);
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, MOVIE_RELEASE_DATE);
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, MOVIE_POSTER_PATH);
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, MOVIE_VOTE_AVERAGE);
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE, MOVIE_LIST_TYPE);
+        ContentValues cv = buildMovieValues();
 
         db.insert(MovieContract.MovieEntry.TABLE_NAME,null,cv);
         db.close();
@@ -52,8 +50,30 @@ public class TestUtilities extends AndroidTestCase
     {
         SQLiteDatabase db = new MovieDbHelper(context).getWritableDatabase();
 
+        ContentValues cv = buildMovieTrailerValues();
+
+        db.insert(MovieContract.VideoEntry.TABLE_NAME,null,cv);
+        db.close();
+    }
+
+    public static ContentValues buildMovieValues()
+    {
         ContentValues cv = new ContentValues();
-        cv.put(MovieContract.VideoEntry.COLUMN_MOVIE_KEY, MOVIE_KEY);
+        cv.put(MovieContract.MovieEntry._ID, MOVIE_KEY);
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, MOVIE_TITLE);
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE__OVERVIEW, MOVIE_OVERVIEW);
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, MOVIE_RELEASE_DATE);
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, MOVIE_POSTER_PATH);
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, MOVIE_VOTE_AVERAGE);
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE, MOVIE_LIST_TYPE);
+
+        return cv;
+    }
+
+    public static ContentValues buildMovieTrailerValues()
+    {
+        ContentValues cv = new ContentValues();
+        cv.put(MovieContract.VideoEntry.COLUMN_MOVIES_KEY, MOVIE_KEY);
         cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_ID, VIDEO_ID);
         cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_NAME, VIDEO_NAME);
         cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_SITE, VIDEO_SITE);
@@ -61,7 +81,20 @@ public class TestUtilities extends AndroidTestCase
         cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_SITE_KEY, VIDEO_KEY);
         cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_TYPE, VIDEO_TYPE);
 
-        db.insert(MovieContract.VideoEntry.TABLE_NAME,null,cv);
-        db.close();
+        return cv;
+    }
+
+    public static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
+        Set<Map.Entry<String, Object>> valueSet = expectedValues.valueSet();
+        for (Map.Entry<String, Object> entry : valueSet) {
+            String columnName = entry.getKey();
+            int idx = valueCursor.getColumnIndex(columnName);
+            assertFalse("Column '" + columnName + "' not found. " + error, idx == -1);
+            String expectedValue = entry.getValue().toString();
+            String valueEntered = valueCursor.getString(idx);
+            assertEquals("Value '" + entry.getValue().toString() +
+                    "' did not match the expected value '" +
+                    expectedValue + "'. " + error, expectedValue, valueEntered);
+        }
     }
 }
