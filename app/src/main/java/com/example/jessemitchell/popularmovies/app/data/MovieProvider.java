@@ -15,17 +15,19 @@ import android.net.Uri;
 public class MovieProvider extends ContentProvider
 {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
-    private static final SQLiteQueryBuilder sMovieWithVideoQB;
+    private static final SQLiteQueryBuilder sMovieJoinVideoQB;
     private MovieDbHelper mMovieDb;
 
     static final int MOVIES = 100;
-    static final int MOVIE_WITH_DETAILS = 101;
-    static final int VIDEO = 200;
+    static final int MOVIE_ID = 101;
+    static final int MOVIE_WITH_VIDEOS = 102;
+    static final int VIDEOS = 200;
+    static final int VIDEO_ID = 201;
 
     static{
-        sMovieWithVideoQB = new SQLiteQueryBuilder();
+        sMovieJoinVideoQB = new SQLiteQueryBuilder();
 
-        sMovieWithVideoQB.setTables(
+        sMovieJoinVideoQB.setTables(
                 MovieContract.MovieEntry.TABLE_NAME +  " INNER JOIN " +
                         MovieContract.VideoEntry.TABLE_NAME +
                         " ON " + MovieContract.MovieEntry.TABLE_NAME +
@@ -33,6 +35,26 @@ public class MovieProvider extends ContentProvider
                         "=" + MovieContract.VideoEntry.TABLE_NAME +
                         "." + MovieContract.VideoEntry.COLUMN_MOVIES_KEY
         );
+    }
+
+    // videos.movie_key = ?
+    private static final String sMovieIdClause = MovieContract.VideoEntry.TABLE_NAME +
+                                                 "." + MovieContract.VideoEntry.COLUMN_MOVIES_KEY +
+                                                 " = ? ";
+
+    private Cursor getMoviesWithVideos(Uri uri, String[] projection)
+    {
+        String movieId = MovieContract.MovieEntry.getMovieIdFromUri(uri);
+        String selection = sMovieIdClause;
+        String[] selectionArgs = new String[]{movieId};
+
+        return sMovieJoinVideoQB.query(mMovieDb.getReadableDatabase(),
+                                       projection,
+                                       selection,
+                                       selectionArgs,
+                                       null,
+                                       null,
+                                       null);
     }
 
     @Override
@@ -49,9 +71,15 @@ public class MovieProvider extends ContentProvider
 
         // content://authority/movie - all movies
         matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIES);
-        // content://authority/movie/id - specific movie with information
-        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/*", MOVIE_WITH_DETAILS);
-
+        // content://authority/movie/id
+        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/#", MOVIE_ID);
+        // content://authority/movie/id/videos - trailers associated to a video
+        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/#/" +
+                                  MovieContract.PATH_VIDEO, MOVIE_WITH_VIDEOS);
+        // content://authority/video - all videos
+        matcher.addURI(authority, MovieContract.PATH_VIDEO, VIDEOS);
+        // content://authority/video/id
+        matcher.addURI(authority, MovieContract.PATH_VIDEO + "/#", VIDEO_ID);
         return matcher;
     }
 
@@ -64,8 +92,14 @@ public class MovieProvider extends ContentProvider
         {
             case MOVIES:
                 return MovieContract.MovieEntry.CONTENT_TYPE;
-            case MOVIE_WITH_DETAILS:
+            case MOVIE_ID:
                 return MovieContract.MovieEntry.CONTENT_ITEM_TYPE;
+            case MOVIE_WITH_VIDEOS:
+                return MovieContract.VideoEntry.CONTENT_TYPE;
+            case VIDEOS:
+                return MovieContract.VideoEntry.CONTENT_TYPE;
+            case VIDEO_ID:
+                return MovieContract.VideoEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -83,25 +117,54 @@ public class MovieProvider extends ContentProvider
             {
                 returnCursor = mMovieDb.getReadableDatabase()
                                        .query(MovieContract.MovieEntry.TABLE_NAME,
-                                               projection,
-                                               selection,
-                                               selectionArgs,
+                                               null,
+                                               null,
+                                               null,
                                                null,
                                                null,
                                                null);
                 break;
             }
-            case MOVIE_WITH_DETAILS:
+            case MOVIE_ID:
             {
-                returnCursor = sMovieWithVideoQB.query(
-                        mMovieDb.getReadableDatabase(),
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        null);
+                returnCursor = mMovieDb.getReadableDatabase()
+                        .query(MovieContract.MovieEntry.TABLE_NAME,
+                                projection,
+                                selection,
+                                selectionArgs,
+                                null,
+                                null,
+                                null);
 
+                break;
+            }
+            case MOVIE_WITH_VIDEOS:
+            {
+                returnCursor = getMoviesWithVideos(uri, projection);
+                break;
+            }
+            case VIDEOS:
+            {
+                returnCursor = mMovieDb.getReadableDatabase()
+                        .query(MovieContract.VideoEntry.TABLE_NAME,
+                                projection,
+                                selection,
+                                selectionArgs,
+                                null,
+                                null,
+                                null);
+                break;
+            }
+            case VIDEO_ID:
+            {
+                returnCursor = mMovieDb.getReadableDatabase()
+                        .query(MovieContract.VideoEntry.TABLE_NAME,
+                                projection,
+                                selection,
+                                selectionArgs,
+                                null,
+                                null,
+                                null);
                 break;
             }
             default:
@@ -130,7 +193,7 @@ public class MovieProvider extends ContentProvider
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
-            case VIDEO:
+            case VIDEOS:
             {
                 long _id = db.insert(MovieContract.VideoEntry.TABLE_NAME, null, values);
                 if (_id > 0)
@@ -160,7 +223,7 @@ public class MovieProvider extends ContentProvider
                 rowsUpdated = db.update(MovieContract.MovieEntry.TABLE_NAME,values,selection,selectionArgs);
                 break;
             }
-            case VIDEO:
+            case VIDEOS:
             {
                 rowsUpdated = db.update(MovieContract.VideoEntry.TABLE_NAME,values,selection,selectionArgs);
                 break;
@@ -187,7 +250,7 @@ public class MovieProvider extends ContentProvider
                 deletedRow = db.delete(MovieContract.MovieEntry.TABLE_NAME,selection, selectionArgs);
                 break;
             }
-            case VIDEO:
+            case VIDEOS:
             {
                 deletedRow = db.delete(MovieContract.VideoEntry.TABLE_NAME, selection, selectionArgs);
                 break;

@@ -49,9 +49,25 @@ public class TestDb extends AndroidTestCase {
         checkTables(db, MovieContract.MovieEntry.TABLE_NAME);
         checkTables(db, MovieContract.VideoEntry.TABLE_NAME);
 
-        db.close();
+
         TestUtilities.buildMovieTable(mContext);
         TestUtilities.buildVideoTable(mContext);
+
+        db.close();
+
+        String movidId = Long.toString(TestUtilities.MOVIE_KEY);
+
+        Cursor allMovies = mContext.getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI, null, MovieContract.MovieEntry._ID, new String[]{movidId}, null);
+
+        Cursor oneMovie = mContext.getContentResolver().query(MovieContract.MovieEntry.buildMovieUri(TestUtilities.MOVIE_KEY), null, null, null, null);
+
+        Cursor oneMovieVideos = mContext.getContentResolver().query(MovieContract.MovieEntry.buildMovieWithVideosUri(TestUtilities.MOVIE_KEY), null,  MovieContract.MovieEntry._ID, new String[]{movidId}, null);
+
+        Cursor allVideos = mContext.getContentResolver().query(MovieContract.VideoEntry.CONTENT_URI, null, null, null, null);
+
+        Cursor oneVideo = mContext.getContentResolver().query(MovieContract.VideoEntry.buildVideoUri(TestUtilities.MOVIE_KEY), null, MovieContract.VideoEntry.COLUMN_MOVIES_KEY, new String[]{movidId}, null);
+
+
     }
 
     private void checkTables(SQLiteDatabase db, String tableName)
