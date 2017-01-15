@@ -83,6 +83,7 @@ public class TestMovieProvider extends AndroidTestCase
                 null,
                 null);
 
+        assertTrue("Query Failed to return a single result", movieCursor.moveToFirst());
         TestUtilities.validateCursor("Movie query failed", movieCursor, content);
 
     }
