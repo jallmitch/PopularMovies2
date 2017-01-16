@@ -11,6 +11,11 @@ import java.util.List;
 
 /**
  * Created by jesse.mitchell on 1/16/2017.
+ *
+ * Resources for Parcelable
+ * https://developer.android.com/reference/android/os/Parcelable.html
+ * http://stackoverflow.com/questions/6201311/how-to-read-write-a-boolean-when-implementing-the-parcelable-interface
+ * http://stackoverflow.com/questions/7042272/how-to-properly-implement-parcelable-with-an-arraylistparcelable
  */
 
 public class MovieDetails
