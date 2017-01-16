@@ -5,3 +5,4 @@ app/build
 app/app.iml
 *.iml
 app/app.iml
+build/intermediates/dex-cache/cache.xml
