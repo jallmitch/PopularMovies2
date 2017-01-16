@@ -18,6 +18,6 @@ public interface TheMovieDB
     Call<MovieDetails> getMovies();
 
 
-    @GET("3/movie/popular")
-    Call<MovieDetails> getMovies(@Path("popular") String listType, @QueryMap Map<String, String> options);
+    @GET("3/movie/{listType}")
+    Call<MovieDetails> getMovies(@Path("listType") String listType, @QueryMap Map<String, String> options);
 }

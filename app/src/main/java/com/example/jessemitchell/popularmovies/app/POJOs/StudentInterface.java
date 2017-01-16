@@ -9,6 +9,6 @@ import retrofit2.http.GET;
 
 public interface StudentInterface
 {
-    @GET("api/RetrofitAndroidObjectResponse")
+    @GET("api/RetrofitAndroidObjectResponse/")
     Call<StudentTest> getStudent();
 }
