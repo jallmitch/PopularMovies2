@@ -1,22 +1,19 @@
 package com.example.jessemitchell.popularmovies.app.POJOs;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
 /**
  * Created by jesse.mitchell on 1/16/2017.
  */
 
 public class StudentTest
 {
-    @SerializedName("StudentId")
-    @Expose
+//    @SerializedName("StudentId")
+//    @Expose
     private String studentId;
-    @SerializedName("StudentName")
-    @Expose
+//    @SerializedName("StudentName")
+//    @Expose
     private String studentName;
-    @SerializedName("StudentMarks")
-    @Expose
+//    @SerializedName("StudentMarks")
+//    @Expose
     private String studentMarks;
 
     public String getStudentId() {

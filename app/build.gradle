@@ -19,7 +19,7 @@ android {
         }
     }
     buildTypes.each {
-        it.buildConfigField('String', 'MOVIE_DB_API_KEY', "\"your key here\"")
+        it.buildConfigField('String', 'MOVIE_DB_API_KEY', "\"yout key here\"")
     }
 }
 
@@ -29,10 +29,10 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile group: 'com.squareup.picasso', name: 'picasso', version: '2.5.2'
-    compile group: 'com.squareup.retrofit2', name: 'retrofit', version: '2.1.0'
-    compile group: 'com.squareup.retrofit2', name: 'converter-gson', version: '2.1.0'
+    compile group: 'com.squareup.retrofit2', name: 'retrofit', version: '2.0.0'
+    compile group: 'com.squareup.retrofit2', name: 'converter-gson', version: '2.0.0'
+    compile 'com.android.volley:volley:1.0.0'
     compile 'org.glassfish:javax.annotation:10.0-b28'
-    compile 'com.squareup.okhttp:okhttp:2.4.0'
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:support-v4:24.2.1'
     compile 'com.android.support:recyclerview-v7:24.2.1'

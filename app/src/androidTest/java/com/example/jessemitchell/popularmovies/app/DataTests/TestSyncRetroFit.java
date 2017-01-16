@@ -21,7 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class TestSyncRetroFit extends AndroidTestCase
 {
 
-    public void testRetroFit() throws IOException
+    public void testRetroFit()
     {
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -34,6 +34,13 @@ public class TestSyncRetroFit extends AndroidTestCase
         String studentUrl = studentInter.getStudent().request().url().toString();
 
         Call<StudentTest> test = studentInter.getStudent();
+        try {
+            StudentTest body = test.execute().body();
+        }
+        catch (IOException e)
+        {
+            Log.v("", e.getMessage());
+        }
 
         test.enqueue(new Callback<StudentTest>() {
             @Override

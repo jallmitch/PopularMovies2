@@ -8,9 +8,9 @@ import android.os.Parcelable;
  * Followed http://www.developerphil.com/parcelable-vs-serializable/ to add Parcelable to this object.
  */
 
-public class Orig implements Parcelable
+public class MovieDetails implements Parcelable
 {
-    private final String LOG_TAG = Orig.class.getSimpleName();
+    private final String LOG_TAG = MovieDetails.class.getSimpleName();
 
 
     private String originalTitle;
@@ -19,11 +19,11 @@ public class Orig implements Parcelable
     private String releaseDate;
     private Double voteAverage;
 
-    public Orig()
+    public MovieDetails()
     {
     }
 
-    public Orig(Parcel in)
+    public MovieDetails(Parcel in)
     {
         originalTitle = in.readString();
         posterPath = in.readString();
@@ -100,15 +100,15 @@ public class Orig implements Parcelable
         dest.writeDouble(voteAverage);
     }
 
-    public static final Parcelable.Creator<Orig> CREATOR = new Parcelable.Creator<Orig>() {
+    public static final Parcelable.Creator<MovieDetails> CREATOR = new Parcelable.Creator<MovieDetails>() {
         @Override
-        public Orig createFromParcel(Parcel parcel) {
-            return new Orig(parcel);
+        public MovieDetails createFromParcel(Parcel parcel) {
+            return new MovieDetails(parcel);
         }
 
         @Override
-        public Orig[] newArray(int i) {
-            return new Orig[i];
+        public MovieDetails[] newArray(int i) {
+            return new MovieDetails[i];
         }
 
     };

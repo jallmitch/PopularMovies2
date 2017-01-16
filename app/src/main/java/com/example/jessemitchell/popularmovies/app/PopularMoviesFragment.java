@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.example.jessemitchell.popularmovies.app.POJOs.TheMovieDB;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -31,7 +32,15 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.example.jessemitchell.popularmovies.app.BuildConfig.MOVIE_DB_API_KEY;
 
@@ -53,10 +62,43 @@ public class PopularMoviesFragment extends Fragment
 
     private void selectList()
     {
-        FetchMoviesTask movieTask = new FetchMoviesTask();
+//        FetchMoviesTask movieTask = new FetchMoviesTask();
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String listType = sharedPrefs.getString(getString(R.string.pref_list_key),getString(R.string.pref_list_default));
-        movieTask.execute(listType);
+//        movieTask.execute(listType);
+
+        final String baseUrl = "https://api.themoviedb.org/";
+        final String API_KEY_PARM = "api_key";
+        final String LANG_PARAM = "language";
+        final String LANG = "en-US";
+        final String type = "popular";
+        Map<String, String> params = new HashMap<>();
+        params.put(API_KEY_PARM, MOVIE_DB_API_KEY);
+        params.put(LANG_PARAM, LANG);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        TheMovieDB movieList = retrofit.create(TheMovieDB.class);
+
+        Call<com.example.jessemitchell.popularmovies.app.POJOs.MovieDetails> movies = movieList.getMovies(type, params);
+
+        movies.enqueue(new Callback<com.example.jessemitchell.popularmovies.app.POJOs.MovieDetails>() {
+            @Override
+            public void onResponse(Call<com.example.jessemitchell.popularmovies.app.POJOs.MovieDetails> call, Response<com.example.jessemitchell.popularmovies.app.POJOs.MovieDetails> response) {
+                com.example.jessemitchell.popularmovies.app.POJOs.MovieDetails body = response.body();
+                List<com.example.jessemitchell.popularmovies.app.POJOs.MovieDetails.Result> results = body.getResults();
+                com.example.jessemitchell.popularmovies.app.POJOs.MovieDetails.Result result = results.get(0);
+                String title = result.getTitle();
+            }
+
+            @Override
+            public void onFailure(Call<com.example.jessemitchell.popularmovies.app.POJOs.MovieDetails> call, Throwable t) {
+
+            }
+        });
     }
 
     @Override
