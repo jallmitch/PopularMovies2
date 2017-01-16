@@ -98,4 +98,33 @@ public class TestUtilities extends AndroidTestCase
                     expectedValue + "'. " + error, expectedValue, actualValue);
         }
     }
+
+    public static void validateJoinCursor(String error, Cursor valueCursor, ContentValues movieValues, ContentValues videoValues)
+    {
+        Set<Map.Entry<String, Object>> movieSet = movieValues.valueSet();
+
+        for (Map.Entry<String, Object> entry : movieSet) {
+            String columnName = entry.getKey();
+            int idx = valueCursor.getColumnIndex(columnName);
+            assertFalse("Column '" + columnName + "' not found. " + error, idx == -1);
+            String expectedValue = entry.getValue().toString();
+            String actualValue = valueCursor.getString(idx);
+            if (!columnName.equals("_id"))
+                assertEquals("Value '" + entry.getValue().toString() +
+                        "' did not match the expected value '" +
+                        expectedValue + "'. " + error, expectedValue, actualValue);
+        }
+        Set<Map.Entry<String, Object>> videoSet = videoValues.valueSet();
+
+        for (Map.Entry<String, Object> entry : videoSet) {
+            String columnName = entry.getKey();
+            int idx = valueCursor.getColumnIndex(columnName);
+            assertFalse("Column '" + columnName + "' not found. " + error, idx == -1);
+            String expectedValue = entry.getValue().toString();
+            String actualValue = valueCursor.getString(idx);
+            assertEquals("Value '" + entry.getValue().toString() +
+                    "' did not match the expected value '" +
+                    expectedValue + "'. " + error, expectedValue, actualValue);
+        }
+    }
 }
