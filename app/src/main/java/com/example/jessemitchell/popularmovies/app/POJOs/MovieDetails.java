@@ -1,5 +1,8 @@
 package com.example.jessemitchell.popularmovies.app.POJOs;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -12,13 +15,12 @@ import java.util.List;
 
 public class MovieDetails
 {
-
     @SerializedName("page")
     @Expose
     private Integer page;
     @SerializedName("results")
     @Expose
-    private List<Result> results = new ArrayList<>();
+    private List<Result> results = null;
     @SerializedName("total_results")
     @Expose
     private Integer totalResults;
@@ -34,7 +36,8 @@ public class MovieDetails
         this.page = page;
     }
 
-    public List<Result> getResults() {
+    public List<Result> getResults()
+    {
         return results;
     }
 
@@ -58,7 +61,7 @@ public class MovieDetails
         this.totalPages = totalPages;
     }
 
-    public class Result {
+    public static class Result implements Parcelable {
 
         @SerializedName("poster_path")
         @Expose
@@ -74,7 +77,7 @@ public class MovieDetails
         private String releaseDate;
         @SerializedName("genre_ids")
         @Expose
-        private List<Integer> genreIds = new ArrayList<>();
+        private List<Integer> genreIds = null;
         @SerializedName("id")
         @Expose
         private Integer id;
@@ -103,8 +106,31 @@ public class MovieDetails
         @Expose
         private Double voteAverage;
 
-        public String getPosterPath() {
-            return posterPath;
+        public Result(Parcel in)
+        {
+            this.posterPath = in.readString();
+            this.adult = in.readByte() != 0;
+            this.overview = in.readString();
+            this.releaseDate = in.readString();
+            this.genreIds = (ArrayList<Integer>)in.readSerializable();
+            this.id = in.readInt();
+            this.originalTitle = in.readString();
+            this.originalLanguage = in.readString();
+            this.title = in.readString();
+            this.backdropPath = in.readString();
+            this.popularity = in.readDouble();
+            this.voteCount = in.readInt();
+            this.video = in.readByte() != 0;
+            this.voteAverage = in.readDouble();
+        }
+
+        public String getPosterPath()
+        {
+            StringBuilder sb = new StringBuilder("http://image.tmdb.org/t/p/")
+                    .append("w185")
+                    .append(this.posterPath);
+
+            return sb.toString();
         }
 
         public void setPosterPath(String posterPath) {
@@ -127,8 +153,9 @@ public class MovieDetails
             this.overview = overview;
         }
 
-        public String getReleaseDate() {
-            return releaseDate;
+        public String getReleaseDate()
+        {
+            return  "Release Date: " + this.releaseDate;
         }
 
         public void setReleaseDate(String releaseDate) {
@@ -212,9 +239,47 @@ public class MovieDetails
         }
 
         public void setVoteAverage(Double voteAverage) {
-            this.voteAverage = voteAverage;
+            this.voteAverage = voteAverage/2;
         }
 
-    }
+        @Override
+        public int describeContents() {
+            return 0;
+        }
 
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+
+            ArrayList<Integer> genIds = new ArrayList<>(this.genreIds);
+            dest.writeString(posterPath);
+            dest.writeByte((byte) (adult ? 1 : 0));
+            dest.writeString(overview);
+            dest.writeString(releaseDate);
+            dest.writeSerializable(genIds);
+            dest.writeInt(id);
+            dest.writeString(originalTitle);
+            dest.writeString(originalLanguage);
+            dest.writeString(title);
+            dest.writeString(backdropPath);
+            dest.writeDouble(popularity);
+            dest.writeInt(voteCount);
+            dest.writeByte((byte)(video ? 1 : 0));
+            dest.writeDouble(voteAverage);
+        }
+
+
+
+        public static final Parcelable.Creator<MovieDetails.Result> CREATOR = new Parcelable.Creator<MovieDetails.Result>() {
+            @Override
+            public MovieDetails.Result createFromParcel(Parcel parcel) {
+                return new MovieDetails.Result(parcel);
+            }
+
+            @Override
+            public MovieDetails.Result[] newArray(int i) {
+                return new MovieDetails.Result[i];
+            }
+
+        };
+    }
 }
