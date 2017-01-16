@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.example.jessemitchell.popularmovies.app.POJOs.MovieDetails;
 import com.squareup.picasso.Picasso;
 
 public class DisplayMovieDetailsActivity extends AppCompatActivity {
@@ -55,7 +56,7 @@ public class DisplayMovieDetailsActivity extends AppCompatActivity {
     {
         private final String LOG_TAG_FRAG = MovieDetailFragment.class.getSimpleName();
 
-        private MovieDetails movie;
+        private MovieDetails.Result movie;
         @Override
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
@@ -86,7 +87,7 @@ public class DisplayMovieDetailsActivity extends AppCompatActivity {
 
                 // Set Overview text.
                 // setMovementMethod http://stackoverflow.com/questions/1748977/making-textview-scrollable-in-android
-                ((TextView)rootView.findViewById(R.id.overview_text_view)).setText(movie.getOverView());
+                ((TextView)rootView.findViewById(R.id.overview_text_view)).setText(movie.getOverview());
                 ((TextView)rootView.findViewById(R.id.overview_text_view))
                         .setMovementMethod(new ScrollingMovementMethod());
             }

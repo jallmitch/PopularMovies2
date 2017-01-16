@@ -13,11 +13,6 @@ import retrofit2.http.QueryMap;
 
 public interface TheMovieDB
 {
-
-    @GET("3/movie/popular?api_key=c7f0a314390229d79eaadc6833d258e4&language=en-US")
-    Call<MovieDetails> getMovies();
-
-
     @GET("3/movie/{listType}")
     Call<MovieDetails> getMovies(@Path("listType") String listType, @QueryMap Map<String, String> options);
 }
