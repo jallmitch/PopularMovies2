@@ -34,6 +34,10 @@ import static com.example.jessemitchell.popularmovies.app.BuildConfig.MOVIE_DB_A
 
 /**
  * Created by jesse.mitchell on 12/28/2016.
+ *
+ * Retrofit resources
+ * https://square.github.io/retrofit/
+ * https://www.androidtutorialpoint.com/networking/retrofit-android-tutorial/
  */
 public class PopularMoviesFragment extends Fragment
 {
@@ -60,6 +64,7 @@ public class PopularMoviesFragment extends Fragment
         Map<String, String> params = new HashMap<>();
         params.put(API_KEY_PARM, MOVIE_DB_API_KEY);
         params.put(LANG_PARAM, LANG);
+
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
