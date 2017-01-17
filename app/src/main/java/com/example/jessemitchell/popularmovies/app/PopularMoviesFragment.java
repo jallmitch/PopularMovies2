@@ -43,20 +43,21 @@ public class PopularMoviesFragment extends Fragment
 {
 
     private final String LOG_TAG = PopularMoviesFragment.class.getSimpleName();
+    private String mlistType;
 
     private ImageAdapter movieDetailsAdapter;
 
     @Override
-    public void onStart() {
+    public void onStart()
+    {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mlistType = sharedPrefs.getString(getString(R.string.pref_list_key),getString(R.string.pref_list_default));
         super.onStart();
         selectList();
     }
 
     private void selectList()
     {
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String listType = sharedPrefs.getString(getString(R.string.pref_list_key),getString(R.string.pref_list_default));
-
         final String baseUrl = "https://api.themoviedb.org/";
         final String API_KEY_PARM = "api_key";
         final String LANG_PARAM = "language";
@@ -73,7 +74,7 @@ public class PopularMoviesFragment extends Fragment
 
         TheMovieDB movieList = retrofit.create(TheMovieDB.class);
 
-        Call<MovieDetails> movies = movieList.getMovies(listType, params);
+        Call<MovieDetails> movies = movieList.getMovies(mlistType, params);
 
         movies.enqueue(new Callback<MovieDetails>() {
             @Override
@@ -99,7 +100,6 @@ public class PopularMoviesFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.movies_main, container, false);
-
         movieDetailsAdapter = new  ImageAdapter(this.getContext(), new ArrayList<MovieDetails.Result>());
 
         GridView gView = (GridView)rootView.findViewById(R.id.movies_grid_view);
