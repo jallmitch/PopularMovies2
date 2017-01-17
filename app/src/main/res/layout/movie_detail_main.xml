@@ -5,52 +5,85 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     >
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:background="@color/colorPrimary"
         android:id="@+id/detail_container"
         >
 
         <TextView
-            android:text="TextView"
+            android:text="Captain America: Civil War"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/movie_text_view"
             android:layout_alignParentTop="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             android:gravity="center"
-            android:textColor="@android:color/background_light" />
+            android:textColor="@android:color/background_light"
 
-        <ImageView
-            android:layout_width="150dp"
-            android:layout_height="215dp"
-            android:id="@+id/movie_image_view"
-            android:layout_below="@+id/vote_average_bar"
-            android:layout_centerHorizontal="true"
             />
 
-        <RatingBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/vote_average_bar"
-            android:layout_below="@+id/movie_text_view"
-            android:layout_centerHorizontal="true"
-            android:background="@color/colorPrimary"
-            android:isIndicator="false"
-            style="@style/Widget.AppCompat.RatingBar.Indicator" />
 
-        <TextView
-            android:text="TextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/movie_image_view"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/date_text_view"
-            android:textColor="@android:color/background_light"
-            android:textColorHighlight="@android:color/white"
-            android:textSize="18sp"
-            android:textAppearance="@style/TextAppearance.AppCompat" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:background="@color/colorPrimary"
+            android:id="@+id/image_container"
+            >
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/movie_image_view"
+                android:layout_below="@+id/vote_average_bar"
+                android:layout_centerHorizontal="true"
+                android:layout_weight="3"
+                android:adjustViewBounds="true"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:background="@color/colorPrimary"
+                android:id="@+id/text_container"
+                android:gravity="center"
+                android:layout_weight="1"
+                >
+                <TextView
+                    android:text="Release Date (2014)"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/movie_image_view"
+                    android:layout_centerHorizontal="true"
+                    android:id="@+id/date_text_view"
+                    android:textColor="@android:color/background_light"
+                    android:textColorHighlight="@android:color/white"
+                    android:textSize="18sp"
+                    android:textAppearance="@style/TextAppearance.AppCompat"
+                    />
+                <RatingBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/vote_average_bar"
+                    android:layout_below="@+id/movie_text_view"
+                    android:layout_centerHorizontal="true"
+                    android:background="@color/colorPrimary"
+                    android:isIndicator="false"
+                    style="@style/Widget.AppCompat.RatingBar.Indicator"
+                    />
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add to Favorites"
+                    android:textColor="@android:color/background_light"
+                    />
+
+                </LinearLayout>
+        </LinearLayout>
 
         <TextView
             android:text="TextView"
@@ -65,5 +98,22 @@
             android:padding="10dp"
             android:textColor="@android:color/white"
             android:textSize="14sp"/>
-    </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/movie_trailers"
+            android:gravity="center"
+            >
+
+        </android.support.v7.widget.RecyclerView>
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/movie_review"
+            android:gravity="center"
+            >
+
+        </android.support.v7.widget.RecyclerView>
+    </LinearLayout>
 </ScrollView>
