@@ -136,8 +136,11 @@ public class PopularMoviesFragment extends Fragment
             if (convertView == null) {
                 // if it's not recycled, initialize some attributes
                 imageView = new ImageView(getContext());
-                imageView.setLayoutParams(new GridView.LayoutParams(740, 1112));
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                imageView.setLayoutParams(
+                        new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                                  ViewGroup.LayoutParams.WRAP_CONTENT));
+                imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                imageView.setAdjustViewBounds(true);
                 imageView.setPadding(10, 10, 10, 10);
             } else {
                 imageView = (ImageView) convertView;
