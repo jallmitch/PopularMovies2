@@ -18,14 +18,14 @@ import java.util.List;
  * http://stackoverflow.com/questions/7042272/how-to-properly-implement-parcelable-with-an-arraylistparcelable
  */
 
-public class MovieDetails
+public class MovieDetailResults
 {
     @SerializedName("page")
     @Expose
     private Integer page;
     @SerializedName("results")
     @Expose
-    private List<Result> results = null;
+    private List<MovieDetail> results = null;
     @SerializedName("total_results")
     @Expose
     private Integer totalResults;
@@ -41,12 +41,12 @@ public class MovieDetails
         this.page = page;
     }
 
-    public List<Result> getResults()
+    public List<MovieDetail> getResults()
     {
         return results;
     }
 
-    public void setResults(List<Result> results) {
+    public void setResults(List<MovieDetail> results) {
         this.results = results;
     }
 
@@ -66,7 +66,7 @@ public class MovieDetails
         this.totalPages = totalPages;
     }
 
-    public static class Result implements Parcelable {
+    public static class MovieDetail implements Parcelable {
 
         @SerializedName("poster_path")
         @Expose
@@ -111,7 +111,9 @@ public class MovieDetails
         @Expose
         private Double voteAverage;
 
-        public Result(Parcel in)
+        public MovieDetail(){}
+
+        public MovieDetail(Parcel in)
         {
             this.posterPath = in.readString();
             this.adult = in.readByte() != 0;
@@ -274,15 +276,15 @@ public class MovieDetails
 
 
 
-        public static final Parcelable.Creator<MovieDetails.Result> CREATOR = new Parcelable.Creator<MovieDetails.Result>() {
+        public static final Parcelable.Creator<MovieDetail> CREATOR = new Parcelable.Creator<MovieDetail>() {
             @Override
-            public MovieDetails.Result createFromParcel(Parcel parcel) {
-                return new MovieDetails.Result(parcel);
+            public MovieDetail createFromParcel(Parcel parcel) {
+                return new MovieDetail(parcel);
             }
 
             @Override
-            public MovieDetails.Result[] newArray(int i) {
-                return new MovieDetails.Result[i];
+            public MovieDetail[] newArray(int i) {
+                return new MovieDetail[i];
             }
 
         };
