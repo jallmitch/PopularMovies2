@@ -1,8 +1,10 @@
 package com.example.jessemitchell.popularmovies.app;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
@@ -15,8 +17,10 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.example.jessemitchell.popularmovies.app.POJOs.MovieDetails;
-import com.example.jessemitchell.popularmovies.app.POJOs.TheMovieDB;
+import com.example.jessemitchell.popularmovies.app.POJOs.MovieDetailResults;
+import com.example.jessemitchell.popularmovies.app.data.MovieContract;
+import com.example.jessemitchell.popularmovies.app.data.MovieDbHelper;
+import com.example.jessemitchell.popularmovies.app.interfaces.TheMovieDB;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -66,7 +70,6 @@ public class PopularMoviesFragment extends Fragment
         params.put(API_KEY_PARM, MOVIE_DB_API_KEY);
         params.put(LANG_PARAM, LANG);
 
-
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -74,23 +77,44 @@ public class PopularMoviesFragment extends Fragment
 
         TheMovieDB movieList = retrofit.create(TheMovieDB.class);
 
-        Call<MovieDetails> movies = movieList.getMovies(mlistType, params);
+        Call<MovieDetailResults> movies = movieList.getMovies(mlistType, params);
 
-        movies.enqueue(new Callback<MovieDetails>() {
+        movies.enqueue(new Callback<MovieDetailResults>() {
             @Override
-            public void onResponse(Call<MovieDetails> call, Response<MovieDetails> response) {
-                MovieDetails body = response.body();
-                List<MovieDetails.Result> results = body.getResults();
+            public void onResponse(Call<MovieDetailResults> call, Response<MovieDetailResults> response) {
+                getContext().getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI,
+                                                  MovieContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE + "=?",
+                                                  new String[]{mlistType});
+
+                List<MovieDetailResults.MovieDetail> results = response.body().getResults();
+                MovieDbHelper movieDbHelper = new MovieDbHelper(getContext());
+                SQLiteDatabase db = movieDbHelper.getWritableDatabase();
+
+                for (MovieDetailResults.MovieDetail md : results) {
+
+                    ContentValues cv = new ContentValues();
+                    cv.put(MovieContract.MovieEntry._ID, md.getId());
+                    cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, md.getTitle());
+                    cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, md.getOverview());
+                    cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, md.getReleaseDate());
+                    cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, md.getPosterPath());
+                    cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, md.getVoteAverage());
+                    cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE, mlistType);
+
+                    db.insert(MovieContract.MovieEntry.TABLE_NAME, null, cv);
+                }
+
+                db.close();
 
                 movieDetailsAdapter.clear();
-                for(MovieDetails.Result movie : results)
+                for(MovieDetailResults.MovieDetail movie : results)
                 {
                     movieDetailsAdapter.add(movie);
                 }
             }
 
             @Override
-            public void onFailure(Call<MovieDetails> call, Throwable t) {
+            public void onFailure(Call<MovieDetailResults> call, Throwable t) {
 
             }
         });
@@ -100,7 +124,7 @@ public class PopularMoviesFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.movies_main, container, false);
-        movieDetailsAdapter = new  ImageAdapter(this.getContext(), new ArrayList<MovieDetails.Result>());
+        movieDetailsAdapter = new  ImageAdapter(this.getContext(), new ArrayList<MovieDetailResults.MovieDetail>());
 
         GridView gView = (GridView)rootView.findViewById(R.id.movies_grid_view);
         gView.setAdapter(movieDetailsAdapter);
@@ -108,7 +132,7 @@ public class PopularMoviesFragment extends Fragment
         gView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                MovieDetails.Result movie = movieDetailsAdapter.getItem(i);
+                MovieDetailResults.MovieDetail movie = movieDetailsAdapter.getItem(i);
                 Intent movieDetailIntent = new Intent(getContext(),DisplayMovieDetailsActivity.class);
                 movieDetailIntent.putExtra(getString(R.string.movie_details_data), (Parcelable) movie);
                 startActivity(movieDetailIntent);
@@ -118,11 +142,11 @@ public class PopularMoviesFragment extends Fragment
     }
 
     // Used https://github.com/udacity/android-custom-arrayadapter as a guide to builde the adapter
-    public class ImageAdapter extends ArrayAdapter<MovieDetails.Result>
+    public class ImageAdapter extends ArrayAdapter<MovieDetailResults.MovieDetail>
     {
         private final String LOG_TAG = ImageAdapter.class.getSimpleName();
 
-        public ImageAdapter(Context context, List<MovieDetails.Result> movieDetails)
+        public ImageAdapter(Context context, List<MovieDetailResults.MovieDetail> movieDetails)
         {
             super(context, 0, movieDetails);
         }
@@ -130,7 +154,7 @@ public class PopularMoviesFragment extends Fragment
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            MovieDetails.Result details = getItem(position);
+            MovieDetailResults.MovieDetail details = getItem(position);
 
             ImageView imageView;
             if (convertView == null) {
