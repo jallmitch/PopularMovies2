@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -12,20 +12,15 @@
         android:background="@color/colorPrimary"
         android:id="@+id/detail_container"
         >
-
         <TextView
             android:text="Captain America: Civil War"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/movie_text_view"
-            android:layout_alignParentTop="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             android:gravity="center"
             android:textColor="@android:color/background_light"
-
             />
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -82,9 +77,8 @@
                     android:textColor="@android:color/background_light"
                     />
 
-                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
-
         <TextView
             android:text="TextView"
             android:layout_width="match_parent"
@@ -92,28 +86,19 @@
             android:layout_centerHorizontal="true"
             android:id="@+id/overview_text_view"
             android:layout_below="@+id/date_text_view"
-            tools:text="A rogue band of resistance fighters unite for a mission to steal the Death Star plans and bring a new hope to the galaxy."
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:padding="10dp"
             android:textColor="@android:color/white"
-            android:textSize="14sp"/>
+            android:textSize="14sp"
+            />
 
-        <android.support.v7.widget.RecyclerView
+        <ExpandableListView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/movie_trailers"
-            android:gravity="center"
+            android:layout_height="350dp"
+            android:id="@+id/detail_expand_view"
             >
+        </ExpandableListView>
 
-        </android.support.v7.widget.RecyclerView>
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/movie_review"
-            android:gravity="center"
-            >
-
-        </android.support.v7.widget.RecyclerView>
     </LinearLayout>
 </ScrollView>
