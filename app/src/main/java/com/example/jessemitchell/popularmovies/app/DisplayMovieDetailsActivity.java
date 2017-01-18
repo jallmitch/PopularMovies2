@@ -12,12 +12,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.jessemitchell.popularmovies.app.POJOs.MovieDetails;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class DisplayMovieDetailsActivity extends AppCompatActivity {
 
@@ -55,6 +61,9 @@ public class DisplayMovieDetailsActivity extends AppCompatActivity {
     public static class MovieDetailFragment extends Fragment
     {
         private final String LOG_TAG_FRAG = MovieDetailFragment.class.getSimpleName();
+        private List<String> groupHeaders;
+        private HashMap<String, List<String>> listChildren;
+
 
         private MovieDetails.Result movie;
         @Override
@@ -90,10 +99,77 @@ public class DisplayMovieDetailsActivity extends AppCompatActivity {
                 ((TextView)rootView.findViewById(R.id.overview_text_view)).setText(movie.getOverview());
                 ((TextView)rootView.findViewById(R.id.overview_text_view))
                         .setMovementMethod(new ScrollingMovementMethod());
+
+                loadData();
+
+                ExpandableListView exListView = (ExpandableListView) rootView.findViewById(R.id.detail_expand_view);
+                ExpandableListAdapter exListAdapter = new ExpandableListAdapter(getContext(), groupHeaders, listChildren);
+
+                exListView.setAdapter(exListAdapter);
+
+                exListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+                    @Override
+                    public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id)
+                    {
+                        Toast.makeText(getContext(), "Yes you have selected to expand the group", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                });
+
+                exListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+                    @Override
+                    public void onGroupExpand(int groupPosition) {
+
+                        Toast.makeText(getContext(), "Group Should Expand", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                exListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+                    @Override
+                    public void onGroupCollapse(int groupPosition) {
+
+                        Toast.makeText(getContext(), "Group should collapse", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                exListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+                    @Override
+                    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+
+                        Toast.makeText(getContext(), "Yes you have selected to expand the child", Toast.LENGTH_SHORT).show();
+
+                        return false;
+                    }
+                });
             }
             else
                 Log.e(LOG_TAG_FRAG, "Intent was null or data was not sent.");
             return rootView;
+        }
+
+        private void loadData()
+        {
+            groupHeaders =new ArrayList<>();
+            listChildren = new HashMap<>();
+
+            groupHeaders.add(0, "Videos");
+            groupHeaders.add(1, "Reviews");
+
+            List<String> videos = new ArrayList<>();
+            videos.add(0, "Official Trailer #1");
+            videos.add(1, "Team Suicide Squad");
+            videos.add(2, "Harley Quinn Therapy");
+            videos.add(3, "comic con remix trailer");
+            videos.add(4, "Blitz Trailer");
+
+            List<String> reviews = new ArrayList<>();
+            reviews.add(0, "Summertime 2016 has not been very kind to DC.....");
+            reviews.add(1, "Suicide Squad is the third and latest entry......");
+            reviews.add(2, "Some semi-interesting visuals and a few..........");
+            reviews.add(3, "**They are not superheroes, they are ............");
+
+            listChildren.put(groupHeaders.get(0), videos);
+            listChildren.put(groupHeaders.get(1), reviews);
         }
 
     }
