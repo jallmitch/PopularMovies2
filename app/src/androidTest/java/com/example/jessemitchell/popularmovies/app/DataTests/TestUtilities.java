@@ -61,7 +61,7 @@ public class TestUtilities extends AndroidTestCase
         ContentValues cv = new ContentValues();
         cv.put(MovieContract.MovieEntry._ID, MOVIE_KEY);
         cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, MOVIE_TITLE);
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE__OVERVIEW, MOVIE_OVERVIEW);
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, MOVIE_OVERVIEW);
         cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, MOVIE_RELEASE_DATE);
         cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, MOVIE_POSTER_PATH);
         cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, MOVIE_VOTE_AVERAGE);

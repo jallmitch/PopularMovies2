@@ -42,7 +42,7 @@ public class MovieContract
         public static final String COLUMN_MOVIE_TITLE = "title";
 
         // Brief synopsis of the movie
-        public static final String COLUMN_MOVIE__OVERVIEW = "overview";
+        public static final String COLUMN_MOVIE_OVERVIEW = "overview";
 
         // API returns the date as YYYY-MM-DD
         public static final String COLUMN_MOVIE_RELEASE_DATE = "release_date";
