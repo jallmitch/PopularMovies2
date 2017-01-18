@@ -92,11 +92,15 @@
             android:textColor="@android:color/white"
             android:textSize="14sp"
             />
-
+        <!--
+          I was having problems with this view and it not scrolling, and then found this article
+          http://stackoverflow.com/questions/6210895/listview-inside-scrollview-is-not-scrolling-on-android/6211286#6211286
+        -->
         <ExpandableListView
             android:layout_width="match_parent"
             android:layout_height="350dp"
             android:id="@+id/detail_expand_view"
+            android:nestedScrollingEnabled="true"
             >
         </ExpandableListView>
 
