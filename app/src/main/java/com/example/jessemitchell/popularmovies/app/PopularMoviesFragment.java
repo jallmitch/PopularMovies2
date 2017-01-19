@@ -1,10 +1,8 @@
 package com.example.jessemitchell.popularmovies.app;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
@@ -18,9 +16,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.example.jessemitchell.popularmovies.app.POJOs.MovieDetailResults;
-import com.example.jessemitchell.popularmovies.app.data.MovieContract;
-import com.example.jessemitchell.popularmovies.app.data.MovieDbHelper;
-import com.example.jessemitchell.popularmovies.app.interfaces.TheMovieDB;
+import com.example.jessemitchell.popularmovies.app.sync.NetworkService;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -28,11 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observable;
+import rx.Observer;
+import rx.Subscription;
 
 import static com.example.jessemitchell.popularmovies.app.BuildConfig.MOVIE_DB_API_KEY;
 
@@ -48,6 +42,7 @@ public class PopularMoviesFragment extends Fragment
 
     private final String LOG_TAG = PopularMoviesFragment.class.getSimpleName();
     private String mlistType;
+    private Subscription subscription;
 
     private ImageAdapter movieDetailsAdapter;
 
@@ -62,7 +57,7 @@ public class PopularMoviesFragment extends Fragment
 
     private void selectList()
     {
-        final String baseUrl = "https://api.themoviedb.org/";
+
         final String API_KEY_PARM = "api_key";
         final String LANG_PARAM = "language";
         final String LANG = "en-US";
@@ -70,54 +65,51 @@ public class PopularMoviesFragment extends Fragment
         params.put(API_KEY_PARM, MOVIE_DB_API_KEY);
         params.put(LANG_PARAM, LANG);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        TheMovieDB movieList = retrofit.create(TheMovieDB.class);
-
-        Call<MovieDetailResults> movies = movieList.getMovies(mlistType, params);
-
-        movies.enqueue(new Callback<MovieDetailResults>() {
+        NetworkService service = new NetworkService();
+        Observable<MovieDetailResults> results =
+                (Observable<MovieDetailResults>)service
+                        .getPreparedObservable(service.getAPI()
+                        .getMovies(mlistType, params)
+                        ,MovieDetailResults.class, true, true );
+        subscription = results.subscribe(new Observer<MovieDetailResults>() {
             @Override
-            public void onResponse(Call<MovieDetailResults> call, Response<MovieDetailResults> response) {
-                getContext().getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI,
-                                                  MovieContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE + "=?",
-                                                  new String[]{mlistType});
+            public void onCompleted()
+            {
 
-                List<MovieDetailResults.MovieDetail> results = response.body().getResults();
-                MovieDbHelper movieDbHelper = new MovieDbHelper(getContext());
-                SQLiteDatabase db = movieDbHelper.getWritableDatabase();
+            }
 
-                for (MovieDetailResults.MovieDetail md : results) {
+            @Override
+            public void onError(Throwable e)
+            {
 
-                    ContentValues cv = new ContentValues();
-                    cv.put(MovieContract.MovieEntry._ID, md.getId());
-                    cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, md.getTitle());
-                    cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, md.getOverview());
-                    cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, md.getReleaseDate());
-                    cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, md.getPosterPath());
-                    cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, md.getVoteAverage());
-                    cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE, mlistType);
+            }
 
-                    db.insert(MovieContract.MovieEntry.TABLE_NAME, null, cv);
-                }
-
-                db.close();
+            @Override
+            public void onNext(MovieDetailResults movieDetailResults)
+            {
+                List<MovieDetailResults.MovieDetail> mdResults = movieDetailResults.getResults();
 
                 movieDetailsAdapter.clear();
-                for(MovieDetailResults.MovieDetail movie : results)
+
+                for (MovieDetailResults.MovieDetail movie : mdResults)
                 {
                     movieDetailsAdapter.add(movie);
                 }
             }
-
-            @Override
-            public void onFailure(Call<MovieDetailResults> call, Throwable t) {
-
-            }
         });
+
+    }
+
+    public void rxUnSubscribe()
+    {
+        if(subscription != null && !subscription.isUnsubscribed())
+            subscription.unsubscribe();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        rxUnSubscribe();
     }
 
     @Override
@@ -131,7 +123,8 @@ public class PopularMoviesFragment extends Fragment
 
         gView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+            {
                 MovieDetailResults.MovieDetail movie = movieDetailsAdapter.getItem(i);
                 Intent movieDetailIntent = new Intent(getContext(),DisplayMovieDetailsActivity.class);
                 movieDetailIntent.putExtra(getString(R.string.movie_details_data), (Parcelable) movie);
