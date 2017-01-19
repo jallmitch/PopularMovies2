@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter
 {
 
     private static Context mContext;
-    private static List<String> mListGroupHeader;
+    private static List<String> mListGroupHeader = new ArrayList<>();
     private static HashMap<String, List<String>> mListChildren = new HashMap<>();
 
     public ExpandableListAdapter(Context context, List<String> listDataHeader, HashMap<String, List<String>> listChildData)
