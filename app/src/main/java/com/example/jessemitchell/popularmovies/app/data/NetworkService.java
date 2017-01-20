@@ -2,8 +2,13 @@ package com.example.jessemitchell.popularmovies.app.data;
 
 import android.util.LruCache;
 
+import java.io.IOException;
 import java.util.Map;
 
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -25,7 +30,8 @@ public class NetworkService
 {
     private static String baseUrl = "https://api.themoviedb.org/";
     private TheMovieDB theMovieDB;
-    private LruCache<Class<?>, Observable<?>> apiObserables = new LruCache<>(10);
+    private OkHttpClient okHttpClient;
+    private LruCache<Class<?>, Observable<?>> apiObservables = new LruCache<>(10);
 
     public NetworkService()
     {
@@ -34,10 +40,12 @@ public class NetworkService
 
     public NetworkService(String baseUrl)
     {
+        okHttpClient = buildClient();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .client(okHttpClient)
                 .build();
 
         theMovieDB = retrofit.create(TheMovieDB.class);
@@ -46,6 +54,56 @@ public class NetworkService
     public TheMovieDB getAPI()
     {
         return theMovieDB;
+    }
+
+    public OkHttpClient buildClient(){
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+
+        builder.addInterceptor(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Response response = chain.proceed(chain.request());
+                // Do anything with response here
+                //if we ant to grab a specific cookie or something..
+                return response;
+            }
+        });
+
+        builder.addInterceptor(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                //this is where we will add whatever we want to our request headers.
+                Request request = chain.request().newBuilder().addHeader("Accept", "application/json").build();
+                return chain.proceed(request);
+            }
+        });
+
+        return  builder.build();
+    }
+
+
+    public void clearCache(){
+        apiObservables.evictAll();
+    }
+
+    public Observable<?> getPreparedObservable(Observable<?> unPreparedObservable,
+                                               Class<?> clazz,
+                                               boolean cacheObservable,
+                                               boolean useCache)
+    {
+        Observable<?> preparedObservable = null;
+
+        if(useCache)
+            preparedObservable = apiObservables.get(clazz);
+
+        if(preparedObservable!=null)
+            return preparedObservable;
+
+        preparedObservable = unPreparedObservable.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        return  preparedObservable;
     }
 
     public interface TheMovieDB
@@ -66,24 +124,5 @@ public class NetworkService
         Observable<ReviewDetailResults> getReviews(@Path("id") int movidId,
                                                    @Path("contentType") String contentType,
                                                    @QueryMap Map<String, String> parameters);
-    }
-
-    public Observable<?> getPreparedObservable(Observable<?> unPreparedObservable,
-                                               Class<?> clazz,
-                                               boolean cacheObservable,
-                                               boolean useCache)
-    {
-        Observable<?> preparedObservable = null;
-
-        if(useCache)
-            preparedObservable = apiObserables.get(clazz);
-
-        if(preparedObservable!=null)
-            return preparedObservable;
-
-        preparedObservable = unPreparedObservable.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
-
-        return  preparedObservable;
     }
 }

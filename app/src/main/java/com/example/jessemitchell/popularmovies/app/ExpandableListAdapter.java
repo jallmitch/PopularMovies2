@@ -27,10 +27,19 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter
     private static List<String> mListGroupHeader = new ArrayList<>();
     private static HashMap<String, List<String>> mListChildren = new HashMap<>();
 
-    public ExpandableListAdapter(Context context, List<String> listDataHeader, HashMap<String, List<String>> listChildData)
+    public ExpandableListAdapter(Context context, HashMap<String, List<String>> listChildData)
     {
+
         this.mContext = context;
-        this.mListGroupHeader = listDataHeader;
+        this.mListGroupHeader.add(0, "Trailers");
+        this.mListGroupHeader.add(1, "Reviews");
+
+        List<String> fakedata = new ArrayList<>();
+        fakedata.add("Test1");
+        fakedata.add("Test2");
+        fakedata.add("Test3");
+        listChildData.put(mListGroupHeader.get(0), fakedata);
+        listChildData.put(mListGroupHeader.get(1), fakedata);
         this.mListChildren.putAll(listChildData);
     }
 
