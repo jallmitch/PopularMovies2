@@ -38,7 +38,7 @@ public class MovieDetailFragment extends Fragment
 
     private List<String> groupHeaders;
     private HashMap<String, List<String>> listChildren;
-
+    private ExpandableListAdapter exListAdapter;
     private NetworkService service;
     private MovieDetailsInteractor detailsInteractor;
 
@@ -97,11 +97,9 @@ public class MovieDetailFragment extends Fragment
             ((TextView)rootView.findViewById(R.id.overview_text_view))
                     .setMovementMethod(new ScrollingMovementMethod());
 
-//                loadTrailerData();
-//                loadReviewData();
-
+            List<String> crap = new ArrayList<>();
             ExpandableListView exListView = (ExpandableListView) rootView.findViewById(R.id.detail_expand_view);
-            ExpandableListAdapter exListAdapter = new ExpandableListAdapter(getContext(), new HashMap<>());
+            ExpandableListAdapter exListAdapter = new ExpandableListAdapter(getContext(), crap, new HashMap<String, List<String>>());
 
 
 
@@ -149,6 +147,7 @@ public class MovieDetailFragment extends Fragment
 
     @Override
     public void onPause() {
+        detailsInteractor.unSubscribeMovieReviews();
         super.onPause();
     }
 
@@ -156,75 +155,48 @@ public class MovieDetailFragment extends Fragment
     private void loadData()
     {
         groupHeaders =new ArrayList<>();
+
+        groupHeaders.add(0, "Trailers");
+        groupHeaders.add(1, "Reviews");
         listChildren = new HashMap<>();
 
         detailsInteractor = new MovieDetailsPresenter(this, service, movie.getId());
         detailsInteractor.loadMovieReviews();
-        detailsInteractor.loadMovieTrailers();
-//
-//
-//        List<String> videos = new ArrayList<>();
-//        videos.add(0, "Official Trailer #1");
-//        videos.add(1, "Team Suicide Squad");
-//        videos.add(2, "Harley Quinn Therapy");
-//        videos.add(3, "comic con remix trailer");
-//        videos.add(4, "Blitz Trailer");
+//        detailsInteractor.loadMovieTrailers();
 
-//        List<String> reviews = new ArrayList<>();
-//        reviews.add(0, "Summertime 2016 has not been very kind to DC Comics-based personalities looking to shine consistently like their big screen Marvel Comics counterparts. Following the super-sized dud that was _Batman v. Superman: Dawn of Justice_ released a few months ago must really put some major pressure on Warner Bros. to gamble on ensuring that the presence of **Suicide Squad** does not meet the same kind of indifferent reception. Well, it turns out that although the anticipation was high for...(line truncated)...");
-//        reviews.add(1, "Suicide Squad is the third and latest entry into the DCEU, and is about a bunch of bad guys that are rounded up to fight for someone else. And just like this year's BvS, this movie received overwhelmingly negative reviews by the critics and was divided among the fans. I was super curious to watch it because unlike many, I actually enjoyed the DCEU till this point. Enjoyed both Man of Steel and BvS. But unfortunately, this one's a mess.\\r\\n\\r\\nThe majority of the movie just fe...(line truncated)... ");
-//        reviews.add(2, "Some semi-interesting visuals and a few characters I'd like to get to know, but an absolute mess of a movie. The thing feels like a trailer, or a clipshow, or a music video or some other sort of two-hour long promotional material for the actual _Suicide Squad_ that comes out later.\\r\\n\\r\\n_Final rating:★★ - Had some things that appeal to me, but a poor finished product._");
-//        reviews.add(3, "**They are not superheroes, they are supervillains.**\\r\\n\\r\\nIt's nothing against DC, but overall I'm starting to think the todays cinema is getting crowded with the lots of superheroes. Just like any pollution or the over population on the earth's surface. It needs stability, but nobody cares about it other than money making agenda. I also think it's going to last for only a few more years, when this trend going to end like that happened in the 70s, 80s and the 90s. And the ...(line truncated)...");
-//
-//        listChildren.put(groupHeaders.get(0), videos);
-//        listChildren.put(groupHeaders.get(1), reviews);
     }
 
-    private List<String> reviews;
-    public void loadReviewData(ReviewDetailResults reviewDetailResults)
+    public void loadRetroData(MovieDetailsPresenter.TrailersAndReviews trailersAndReviews)
     {
-        List<ReviewDetailResults.ReviewDetail> reviewResults = reviewDetailResults.getResults();
-        reviews = new ArrayList<>();
+        List<ReviewDetailResults.ReviewDetail> reviewResults = trailersAndReviews.reviews.getResults();
+        List<VideoDetailResults.VideoDetail> trailerResults = trailersAndReviews.trailers.getResults();
+
+        List<String> reviews = new ArrayList<>();
         for(ReviewDetailResults.ReviewDetail rd : reviewResults)
         {
             reviews.add(rd.getContent());
         }
-    }
+        exListAdapter.setReviewData(reviews);
 
-    private List<String> videos;
-
-    public void loadTrailerData(VideoDetailResults videoDetailResults)
-    {
-        List<VideoDetailResults.VideoDetail> videoResults = videoDetailResults.getResults();
-        videos = new ArrayList<>();
-
-        for(VideoDetailResults.VideoDetail video : videoResults)
+        List<String> trailers = new ArrayList<>();
+        for(VideoDetailResults.VideoDetail vd : trailerResults)
         {
-            videos.add(video.getName());
+            trailers.add(vd.getName());
         }
+        exListAdapter.setTrailerData(trailers);
     }
 
-//    private void addToFavorites()
+//    public void loadTrailerData(VideoDetailResults videoDetailResults)
 //    {
-//        final String FAVORITE = "favorite";
-//        MovieDbHelper movieDbHelper = new MovieDbHelper(getContext());
-//        SQLiteDatabase db = movieDbHelper.getWritableDatabase();
+//        List<VideoDetailResults.VideoDetail> videoResults = videoDetailResults.getResults();
+//        List<String> videos = new ArrayList<>();
 //
-//        ContentValues cv = new ContentValues();
-//        cv.put(MovieContract.MovieEntry._ID, movie.getId());
-//        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, movie.getTitle());
-//        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, movie.getOverview());
-//        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, movie.getReleaseDate());
-//        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, movie.getPosterPath());
-//        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, movie.getVoteAverage());
-//        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE, FAVORITE);
+//        for(VideoDetailResults.VideoDetail video : videoResults)
+//        {
+//            videos.add(video.getName());
+//        }
 //
-//        db.insert(MovieContract.MovieEntry.TABLE_NAME, null, cv);
-//
-//        db.close();
-//
-//        //Todo: save trailers
-//        //Todo: save reviews
+//        exListAdapter.setTrailerData(videos);
 //    }
 
 }

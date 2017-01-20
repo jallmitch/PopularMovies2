@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,24 +23,35 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter
 {
 
     private static Context mContext;
-    private static List<String> mListGroupHeader = new ArrayList<>();
-    private static HashMap<String, List<String>> mListChildren = new HashMap<>();
-
-    public ExpandableListAdapter(Context context, HashMap<String, List<String>> listChildData)
+    private static List<String> mListGroupHeader;
+    private static HashMap<String, List<String>> mListChildren;
+//
+    public ExpandableListAdapter(Context context, List<String> groupHeaders, HashMap<String, List<String>> listChildData)
     {
 
         this.mContext = context;
-        this.mListGroupHeader.add(0, "Trailers");
-        this.mListGroupHeader.add(1, "Reviews");
+        this.mListGroupHeader = groupHeaders;
+        this.mListChildren = listChildData;
 
-        List<String> fakedata = new ArrayList<>();
-        fakedata.add("Test1");
-        fakedata.add("Test2");
-        fakedata.add("Test3");
-        listChildData.put(mListGroupHeader.get(0), fakedata);
-        listChildData.put(mListGroupHeader.get(1), fakedata);
-        this.mListChildren.putAll(listChildData);
     }
+
+    public void setTrailerData(List<String> trailerData)
+    {
+        if (trailerData.size() ==  0)
+            trailerData.add("No Trailers");
+
+        mListChildren.put(mListGroupHeader.get(0), trailerData);
+
+    }
+
+    public void setReviewData(List<String> reviewData)
+    {
+        if (reviewData.size() == 0)
+            reviewData.add("No Reviews");
+
+        mListChildren.put(mListGroupHeader.get(1), reviewData);
+    }
+
 
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent)

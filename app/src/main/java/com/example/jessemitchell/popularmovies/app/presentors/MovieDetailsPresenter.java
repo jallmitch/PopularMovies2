@@ -8,20 +8,28 @@ import com.example.jessemitchell.popularmovies.app.data.VideoDetailResults;
 import java.util.HashMap;
 import java.util.Map;
 
+import retrofit2.Retrofit;
 import rx.Observable;
-import rx.Observer;
+import rx.Subscriber;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 
 import static com.example.jessemitchell.popularmovies.app.BuildConfig.MOVIE_DB_API_KEY;
 
 /**
  * Created by jesse.mitchell on 1/19/2017.
+ *
+ * Resource for using Observables
+ * https://newfivefour.com/android-rxjava-wait-for-network-calls-finish.html
  */
 
 public class MovieDetailsPresenter implements MovieDetailsInteractor
 {
     private MovieDetailFragment fragment;
     private NetworkService service;
+    private Retrofit retrofit;
     private Subscription reviewSubscrip;
     private Subscription trailerSubscrip;
     private int movieId;
@@ -31,11 +39,13 @@ public class MovieDetailsPresenter implements MovieDetailsInteractor
         this.fragment = fragment;
         this.service = new NetworkService();
         this.movieId = movieId;
+        this.retrofit = this.service.getRetrofit();
     }
 
     @Override
     public void loadMovieReviews()
     {
+
         final String API_KEY_PARM = "api_key";
         final String LANG_PARAM = "language";
         final String LANG = "en-US";
@@ -43,66 +53,56 @@ public class MovieDetailsPresenter implements MovieDetailsInteractor
         params.put(API_KEY_PARM, MOVIE_DB_API_KEY);
         params.put(LANG_PARAM, LANG);
 
-        Observable<ReviewDetailResults> results =
-                (Observable<ReviewDetailResults>)service
-                        .getPreparedObservable(service.getAPI()
-                                        .getReviews(movieId, "reviews", params)
-                                ,ReviewDetailResults.class, true, true );
-        reviewSubscrip = results.subscribe(new Observer<ReviewDetailResults>() {
+
+        Observable<VideoDetailResults> trailerResults = retrofit
+                .create(NetworkService.TheMovieDB.class)
+                .getVideos(movieId, "videos", params)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
+
+
+        Observable<ReviewDetailResults> reviewResults = retrofit
+                .create(NetworkService.TheMovieDB.class)
+                .getReviews(movieId, "reviews", params)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        Observable<TrailersAndReviews> combined  = Observable.zip(reviewResults, trailerResults, new Func2<ReviewDetailResults,VideoDetailResults, TrailersAndReviews>(){
             @Override
-            public void onCompleted()
-            {
-
-            }
-
-            @Override
-            public void onError(Throwable e)
-            {
-
-            }
-
-            @Override
-            public void onNext(ReviewDetailResults reviewDetailResults)
-            {
-                fragment.loadReviewData(reviewDetailResults);
+            public TrailersAndReviews call(ReviewDetailResults reviewDetailResults, VideoDetailResults videoDetailResults) {
+                return new TrailersAndReviews(reviewDetailResults,videoDetailResults);
             }
         });
+
+        reviewSubscrip = combined.subscribe(new Subscriber<TrailersAndReviews>() {
+            @Override
+            public void onNext(TrailersAndReviews trailersAndReviews) {
+
+                fragment.loadRetroData(trailersAndReviews);
+            }
+
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+            }
+        });
+
     }
 
-    @Override
-    public void loadMovieTrailers()
+    public class TrailersAndReviews
     {
-        final String API_KEY_PARM = "api_key";
-        final String LANG_PARAM = "language";
-        final String LANG = "en-US";
-        Map<String, String> params = new HashMap<>();
-        params.put(API_KEY_PARM, MOVIE_DB_API_KEY);
-        params.put(LANG_PARAM, LANG);
+        public ReviewDetailResults reviews;
+        public VideoDetailResults trailers;
 
-        Observable<VideoDetailResults> results =
-                (Observable<VideoDetailResults>)service
-                        .getPreparedObservable(service.getAPI()
-                                        .getReviews(movieId, "videos", params)
-                                ,VideoDetailResults.class, true, true );
-        trailerSubscrip = results.subscribe(new Observer<VideoDetailResults>() {
-            @Override
-            public void onCompleted()
-            {
-
-            }
-
-            @Override
-            public void onError(Throwable e)
-            {
-
-            }
-
-            @Override
-            public void onNext(VideoDetailResults reviewDetailResults)
-            {
-                fragment.loadTrailerData(reviewDetailResults);
-            }
-        });
+        public TrailersAndReviews(ReviewDetailResults reviews, VideoDetailResults trailers)
+        {
+            this.reviews = reviews;
+            this.trailers = trailers;
+        }
     }
 
     @Override
@@ -113,11 +113,4 @@ public class MovieDetailsPresenter implements MovieDetailsInteractor
             reviewSubscrip.unsubscribe();
     }
 
-    @Override
-    public void unSubscribeMovieTrailers()
-    {
-
-        if(trailerSubscrip!=null && !trailerSubscrip.isUnsubscribed())
-            trailerSubscrip.unsubscribe();
-    }
 }

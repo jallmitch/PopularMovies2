@@ -3,6 +3,7 @@ package com.example.jessemitchell.popularmovies.app.data;
 import android.util.LruCache;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import okhttp3.Interceptor;
@@ -19,6 +20,8 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static com.example.jessemitchell.popularmovies.app.BuildConfig.MOVIE_DB_API_KEY;
+
 /**
  * Created by jesse.mitchell on 1/18/2017.
  *
@@ -30,6 +33,7 @@ public class NetworkService
 {
     private static String baseUrl = "https://api.themoviedb.org/";
     private TheMovieDB theMovieDB;
+    private Retrofit retrofit;
     private OkHttpClient okHttpClient;
     private LruCache<Class<?>, Observable<?>> apiObservables = new LruCache<>(10);
 
@@ -40,8 +44,15 @@ public class NetworkService
 
     public NetworkService(String baseUrl)
     {
+        final String API_KEY_PARM = "api_key";
+        final String LANG_PARAM = "language";
+        final String LANG = "en-US";
+        Map<String, String> params = new HashMap<>();
+        params.put(API_KEY_PARM, MOVIE_DB_API_KEY);
+        params.put(LANG_PARAM, LANG);
+
         okHttpClient = buildClient();
-        Retrofit retrofit = new Retrofit.Builder()
+        retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
@@ -49,6 +60,12 @@ public class NetworkService
                 .build();
 
         theMovieDB = retrofit.create(TheMovieDB.class);
+
+    }
+
+    public Retrofit getRetrofit()
+    {
+        return retrofit;
     }
 
     public TheMovieDB getAPI()
