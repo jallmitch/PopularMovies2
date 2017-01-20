@@ -32,6 +32,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter
         this.mContext = context;
         this.mListGroupHeader = groupHeaders;
         this.mListChildren = listChildData;
+        this.mListGroupHeader.add(0, "Trailers");
+        this.mListGroupHeader.add(1, "Reviews");
 
     }
 
