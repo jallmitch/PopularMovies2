@@ -1,6 +1,9 @@
 package com.example.jessemitchell.popularmovies.app;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -41,6 +44,12 @@ public class MovieDetailFragment extends Fragment
     private ExpandableListAdapter exListAdapter;
     private NetworkService service;
     private MovieDetailsInteractor detailsInteractor;
+    private List<ReviewDetailResults.ReviewDetail> reviewResults;
+    private List<VideoDetailResults.VideoDetail> trailerResults;
+
+
+    private final int TRAILERS = 0;
+    private final int REVIEWS = 1;
 
     private MovieDetailResults.MovieDetail movie;
 
@@ -56,7 +65,7 @@ public class MovieDetailFragment extends Fragment
         Intent intent = getActivity().getIntent();
         String movieDetailData = getString(R.string.movie_details_data);
         View rootView = inflater.inflate(R.layout.movie_detail_main,container,false);
-
+        PackageManager packageManager = getActivity().getPackageManager();
         service = new RxApplication().getNetorkService();
 
 
@@ -107,7 +116,6 @@ public class MovieDetailFragment extends Fragment
                 @Override
                 public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id)
                 {
-                    Toast.makeText(getContext(), "Yes you have selected to expand the group", Toast.LENGTH_SHORT).show();
                     return false;
                 }
             });
@@ -116,7 +124,6 @@ public class MovieDetailFragment extends Fragment
                 @Override
                 public void onGroupExpand(int groupPosition) {
 
-                    Toast.makeText(getContext(), "Group Should Expand", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -124,7 +131,6 @@ public class MovieDetailFragment extends Fragment
                 @Override
                 public void onGroupCollapse(int groupPosition) {
 
-                    Toast.makeText(getContext(), "Group should collapse", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -132,8 +138,33 @@ public class MovieDetailFragment extends Fragment
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
-                    Toast.makeText(getContext(), "Yes you have selected to expand the child", Toast.LENGTH_SHORT).show();
-
+                    switch (groupPosition)
+                    {
+                        case TRAILERS:
+                        {
+                            String key = trailerResults.get(childPosition).getKey();
+                            Uri trailerUri = new Uri.Builder().scheme("https")
+                                                              .authority("www.youtube.com")
+                                                              .appendPath("watch")
+                                                              .appendQueryParameter("v", key)
+                                                              .build();
+                            Intent trailerIntent = new Intent(Intent.ACTION_VIEW, trailerUri);
+                            List<ResolveInfo> intentList = packageManager.queryIntentActivities(trailerIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                            if (intentList.size() > 0) {
+                                trailerIntent.putExtra("force_fullscreen", true);
+                                startActivity(trailerIntent);
+                            }
+                            else
+                            {
+                                Toast.makeText(getContext(), "No available player is available for this trailer.",Toast.LENGTH_SHORT).show();
+                            }
+                            break;
+                        }
+                        case REVIEWS:
+                        {
+                            break;
+                        }
+                    }
                     return false;
                 }
             });
@@ -149,7 +180,6 @@ public class MovieDetailFragment extends Fragment
         super.onPause();
     }
 
-
     private void loadData()
     {
         groupHeaders =new ArrayList<>();
@@ -160,14 +190,12 @@ public class MovieDetailFragment extends Fragment
 
         detailsInteractor = new MovieDetailsPresenter(this, service, movie.getId());
         detailsInteractor.loadMovieReviews();
-//        detailsInteractor.loadMovieTrailers();
-
     }
 
     public void loadRetroData(MovieDetailsPresenter.TrailersAndReviews trailersAndReviews)
     {
-        List<ReviewDetailResults.ReviewDetail> reviewResults = trailersAndReviews.reviews.getResults();
-        List<VideoDetailResults.VideoDetail> trailerResults = trailersAndReviews.trailers.getResults();
+        reviewResults = trailersAndReviews.reviews.getResults();
+        trailerResults = trailersAndReviews.trailers.getResults();
 
         List<String> reviews = new ArrayList<>();
         for(ReviewDetailResults.ReviewDetail rd : reviewResults)
@@ -184,18 +212,5 @@ public class MovieDetailFragment extends Fragment
         exListAdapter.setReviewData(reviews);
         exListAdapter.setTrailerData(trailers);
     }
-
-//    public void loadTrailerData(VideoDetailResults videoDetailResults)
-//    {
-//        List<VideoDetailResults.VideoDetail> videoResults = videoDetailResults.getResults();
-//        List<String> videos = new ArrayList<>();
-//
-//        for(VideoDetailResults.VideoDetail video : videoResults)
-//        {
-//            videos.add(video.getName());
-//        }
-//
-//        exListAdapter.setTrailerData(videos);
-//    }
 
 }
