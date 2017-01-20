@@ -97,10 +97,8 @@ public class MovieDetailFragment extends Fragment
             ((TextView)rootView.findViewById(R.id.overview_text_view))
                     .setMovementMethod(new ScrollingMovementMethod());
 
-            List<String> crap = new ArrayList<>();
             ExpandableListView exListView = (ExpandableListView) rootView.findViewById(R.id.detail_expand_view);
-            ExpandableListAdapter exListAdapter = new ExpandableListAdapter(getContext(), crap, new HashMap<String, List<String>>());
-
+            exListAdapter = new ExpandableListAdapter(getContext(),  new ArrayList<>(), new HashMap<String, List<String>>());
 
 
             exListView.setAdapter(exListAdapter);
@@ -176,13 +174,14 @@ public class MovieDetailFragment extends Fragment
         {
             reviews.add(rd.getContent());
         }
-        exListAdapter.setReviewData(reviews);
 
         List<String> trailers = new ArrayList<>();
         for(VideoDetailResults.VideoDetail vd : trailerResults)
         {
             trailers.add(vd.getName());
         }
+
+        exListAdapter.setReviewData(reviews);
         exListAdapter.setTrailerData(trailers);
     }
 
