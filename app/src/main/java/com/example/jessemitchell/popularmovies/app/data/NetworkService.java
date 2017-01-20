@@ -1,10 +1,6 @@
-package com.example.jessemitchell.popularmovies.app.sync;
+package com.example.jessemitchell.popularmovies.app.data;
 
 import android.util.LruCache;
-
-import com.example.jessemitchell.popularmovies.app.POJOs.MovieDetailResults;
-import com.example.jessemitchell.popularmovies.app.POJOs.ReviewDetailResults;
-import com.example.jessemitchell.popularmovies.app.POJOs.VideoDetailResults;
 
 import java.util.Map;
 
@@ -20,6 +16,9 @@ import rx.schedulers.Schedulers;
 
 /**
  * Created by jesse.mitchell on 1/18/2017.
+ *
+ * Retrofit2 with rxjava resource
+ * http://www.captechconsulting.com/blogs/a-mvp-approach-to-lifecycle-safe-requests-with-retrofit-20-and-rxjava
  */
 
 public class NetworkService

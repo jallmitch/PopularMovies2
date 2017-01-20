@@ -15,20 +15,13 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.example.jessemitchell.popularmovies.app.POJOs.MovieDetailResults;
-import com.example.jessemitchell.popularmovies.app.sync.NetworkService;
+import com.example.jessemitchell.popularmovies.app.data.MovieDetailResults;
+import com.example.jessemitchell.popularmovies.app.presentors.MovieListInteractor;
+import com.example.jessemitchell.popularmovies.app.presentors.MovieListPresenter;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import rx.Observable;
-import rx.Observer;
-import rx.Subscription;
-
-import static com.example.jessemitchell.popularmovies.app.BuildConfig.MOVIE_DB_API_KEY;
 
 /**
  * Created by jesse.mitchell on 12/28/2016.
@@ -41,9 +34,9 @@ public class PopularMoviesFragment extends Fragment
 {
 
     private final String LOG_TAG = PopularMoviesFragment.class.getSimpleName();
-    private String mlistType;
-    private Subscription subscription;
 
+    private String mlistType;
+    private MovieListInteractor moviList;
     private ImageAdapter movieDetailsAdapter;
 
     @Override
@@ -52,64 +45,26 @@ public class PopularMoviesFragment extends Fragment
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mlistType = sharedPrefs.getString(getString(R.string.pref_list_key),getString(R.string.pref_list_default));
         super.onStart();
-        selectList();
+        moviList = new MovieListPresenter(this, mlistType);
+        moviList.loadMovieList();
     }
 
-    private void selectList()
+    public void addMovies(MovieDetailResults movies)
     {
+        List<MovieDetailResults.MovieDetail> mdResults = movies.getResults();
 
-        final String API_KEY_PARM = "api_key";
-        final String LANG_PARAM = "language";
-        final String LANG = "en-US";
-        Map<String, String> params = new HashMap<>();
-        params.put(API_KEY_PARM, MOVIE_DB_API_KEY);
-        params.put(LANG_PARAM, LANG);
+        movieDetailsAdapter.clear();
 
-        NetworkService service = new NetworkService();
-        Observable<MovieDetailResults> results =
-                (Observable<MovieDetailResults>)service
-                        .getPreparedObservable(service.getAPI()
-                        .getMovies(mlistType, params)
-                        ,MovieDetailResults.class, true, true );
-        subscription = results.subscribe(new Observer<MovieDetailResults>() {
-            @Override
-            public void onCompleted()
-            {
-
-            }
-
-            @Override
-            public void onError(Throwable e)
-            {
-
-            }
-
-            @Override
-            public void onNext(MovieDetailResults movieDetailResults)
-            {
-                List<MovieDetailResults.MovieDetail> mdResults = movieDetailResults.getResults();
-
-                movieDetailsAdapter.clear();
-
-                for (MovieDetailResults.MovieDetail movie : mdResults)
-                {
-                    movieDetailsAdapter.add(movie);
-                }
-            }
-        });
-
-    }
-
-    public void rxUnSubscribe()
-    {
-        if(subscription != null && !subscription.isUnsubscribed())
-            subscription.unsubscribe();
+        for (MovieDetailResults.MovieDetail movie : mdResults)
+        {
+            movieDetailsAdapter.add(movie);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        rxUnSubscribe();
+        moviList.unSubscribeMovieList();
     }
 
     @Override
