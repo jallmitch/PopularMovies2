@@ -1,4 +1,4 @@
-package com.example.jessemitchell.popularmovies.app.POJOs;
+package com.example.jessemitchell.popularmovies.app.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
