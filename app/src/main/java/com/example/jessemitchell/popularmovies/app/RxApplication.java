@@ -16,6 +16,7 @@ public class RxApplication extends Application
     public void onCreate() {
         super.onCreate();
         netService = new NetworkService();
+        netService.clearCache();
     }
 
     public NetworkService getNetorkService()

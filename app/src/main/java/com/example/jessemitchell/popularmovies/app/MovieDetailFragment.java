@@ -101,7 +101,7 @@ public class MovieDetailFragment extends Fragment
 //                loadReviewData();
 
             ExpandableListView exListView = (ExpandableListView) rootView.findViewById(R.id.detail_expand_view);
-            ExpandableListAdapter exListAdapter = new ExpandableListAdapter(getContext(),  new ArrayList<>(), new HashMap<>());
+            ExpandableListAdapter exListAdapter = new ExpandableListAdapter(getContext(), new HashMap<>());
 
 
 
@@ -162,8 +162,6 @@ public class MovieDetailFragment extends Fragment
         detailsInteractor.loadMovieReviews();
         detailsInteractor.loadMovieTrailers();
 //
-//        groupHeaders.add(0, "Trailers");
-//        groupHeaders.add(1, "Reviews");
 //
 //        List<String> videos = new ArrayList<>();
 //        videos.add(0, "Official Trailer #1");
