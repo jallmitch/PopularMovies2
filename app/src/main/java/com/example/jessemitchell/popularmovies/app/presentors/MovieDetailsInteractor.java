@@ -6,8 +6,6 @@ package com.example.jessemitchell.popularmovies.app.presentors;
 
 public interface MovieDetailsInteractor
 {
-    void loadMovieTrailers();
     void loadMovieReviews();
     void unSubscribeMovieReviews();
-    void unSubscribeMovieTrailers();
 }
