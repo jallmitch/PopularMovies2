@@ -33,31 +33,7 @@ public class MovieDbHelper extends SQLiteOpenHelper
                        MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE + " REAL NOT NULL, " +
                        MovieContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE + " TEXT NOT NULL);";
 
-        final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE " + MovieContract.VideoEntry.TABLE_NAME +
-                " (" + MovieContract.VideoEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                       MovieContract.VideoEntry.COLUMN_MOVIES_KEY + " INTEGER NOT NULL, " +
-                       MovieContract.VideoEntry.COLUMN_VIDEO_ID + " TEXT NOT NULL, " +
-                       MovieContract.VideoEntry.COLUMN_VIDEO_NAME + " TEXT NOT NULL, " +
-                       MovieContract.VideoEntry.COLUMN_VIDEO_SITE + " TEXT NOT NULL, " +
-                       MovieContract.VideoEntry.COLUMN_VIDEO_SITE_KEY + " TEXT NOT NULL, " +
-                       MovieContract.VideoEntry.COLUMN_VIDEO_TYPE + " TEXT NOT NULL, " +
-                       MovieContract.VideoEntry.COLUMN_VIDEO_SIZE + " INTEGER NOT NULL, " +
-                 " FOREIGN KEY (" + MovieContract.VideoEntry.COLUMN_MOVIES_KEY + ") REFERENCES " +
-                MovieContract.MovieEntry.TABLE_NAME + " (" + MovieContract.MovieEntry.COLUMN_MOVIE_ID + "));";
-
-
-        final String SQL_CREATE_REVIEW_TABLE = "CREATE TABLE " + MovieContract.ReviewEntry.TABLE_NAME +
-                " (" + MovieContract.ReviewEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                MovieContract.ReviewEntry.COLUMN_MOVIES_KEY + " INTEGER NOT NULL, " +
-                MovieContract.ReviewEntry.COLUMN_REVIEW_ID + " TEXT NOT NULL, " +
-                MovieContract.ReviewEntry.COLUMN_REVIEW_AUTHOR + " TEXT NOT NULL, " +
-                MovieContract.ReviewEntry.COLUMN_REVIEW_CONTENT + " TEXT NOT NULL, " +
-                " FOREIGN KEY (" + MovieContract.ReviewEntry.COLUMN_MOVIES_KEY + ") REFERENCES " +
-                MovieContract.MovieEntry.TABLE_NAME + " (" + MovieContract.MovieEntry.COLUMN_MOVIE_ID + "));";
-
         db.execSQL(SQL_CREATE_MOVIE_TABLE);
-        db.execSQL(SQL_CREATE_VIDEO_TABLE);
-        db.execSQL(SQL_CREATE_REVIEW_TABLE);
     }
 
     @Override

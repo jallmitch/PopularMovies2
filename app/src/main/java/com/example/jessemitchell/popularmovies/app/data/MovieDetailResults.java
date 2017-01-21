@@ -270,8 +270,6 @@ public class MovieDetailResults
             dest.writeDouble(voteAverage);
         }
 
-
-
         public static final Parcelable.Creator<MovieDetail> CREATOR = new Parcelable.Creator<MovieDetail>() {
             @Override
             public MovieDetail createFromParcel(Parcel parcel) {

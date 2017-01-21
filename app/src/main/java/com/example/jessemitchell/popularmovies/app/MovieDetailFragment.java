@@ -80,27 +80,6 @@ public class MovieDetailFragment extends Fragment
             Toast.makeText(getContext(), title +  " was added to your Favorites list.",Toast.LENGTH_SHORT).show();
 
         db.close();
-
-//
-//        int count = 0;
-//        if (reviewResults.size() > 0) {
-//            ContentValues[] rCV = new ContentValues[reviewResults.size()];
-//            for (ReviewDetailResults.ReviewDetail review : reviewResults) {
-//
-//                rCV[count] = getReviewContentValues(review, movieId);
-//            }
-//            contentResolver.bulkInsert(MovieContract.ReviewEntry.CONTENT_URI, rCV);
-//        }
-//
-//        if (trailerResults.size() > 0) {
-//            ContentValues[] vCV = new ContentValues[trailerResults.size()];
-//            count = 0;
-//            for (VideoDetailResults.VideoDetail trailer : trailerResults) {
-//
-//                vCV[count] = getVideoContentValues(trailer, movieId);
-//            }
-//            contentResolver.bulkInsert(MovieContract.VideoEntry.CONTENT_URI, vCV);
-//        }
     }
 
     private ContentValues getMovieContentValues()
@@ -115,29 +94,6 @@ public class MovieDetailFragment extends Fragment
         cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE, "FAVORITE");
         return cv;
     }
-//
-//    private ContentValues getVideoContentValues(VideoDetailResults.VideoDetail video, long movieId)
-//    {
-//        ContentValues cv = new ContentValues();
-//        cv.put(MovieContract.VideoEntry.COLUMN_MOVIES_KEY, movieId);
-//        cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_ID, video.getId());
-//        cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_NAME, video.getName());
-//        cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_SITE, video.getSite());
-//        cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_SITE_KEY, video.getKey());
-//        cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_SIZE, video.getSize());
-//        cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_TYPE, video.getType());
-//        return cv;
-//    }
-//
-//    private ContentValues getReviewContentValues(ReviewDetailResults.ReviewDetail review, long movieId)
-//    {
-//        ContentValues cv = new ContentValues();
-//        cv.put(MovieContract.ReviewEntry.COLUMN_MOVIES_KEY, movieId);
-//        cv.put(MovieContract.ReviewEntry.COLUMN_REVIEW_ID, review.getId());
-//        cv.put(MovieContract.ReviewEntry.COLUMN_REVIEW_AUTHOR, review.getAuthor());
-//        cv.put(MovieContract.ReviewEntry.COLUMN_REVIEW_CONTENT, review.getContent());
-//        return cv;
-//    }
 
     private void removeFavorite(String title, int movieId)
     {
