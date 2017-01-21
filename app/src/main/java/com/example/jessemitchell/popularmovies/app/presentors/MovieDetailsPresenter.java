@@ -31,7 +31,6 @@ public class MovieDetailsPresenter implements MovieDetailsInteractor
     private NetworkService service;
     private Retrofit retrofit;
     private Subscription reviewSubscrip;
-    private Subscription trailerSubscrip;
     private int movieId;
 
     public MovieDetailsPresenter(MovieDetailFragment fragment, NetworkService service, int movieId)

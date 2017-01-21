@@ -65,7 +65,6 @@ public class MovieListPresenter implements MovieListInteractor
                 fragment.addMovies(movieDetailResults);
             }
         });
-
     }
 
     @Override

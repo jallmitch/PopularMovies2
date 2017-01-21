@@ -1,24 +1,29 @@
 package com.example.jessemitchell.popularmovies.app;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
 
+import com.example.jessemitchell.popularmovies.app.data.MovieContract;
 import com.example.jessemitchell.popularmovies.app.data.MovieDetailResults;
+import com.example.jessemitchell.popularmovies.app.presentors.ImageAdapter;
+import com.example.jessemitchell.popularmovies.app.presentors.MovieListAdapter;
 import com.example.jessemitchell.popularmovies.app.presentors.MovieListInteractor;
 import com.example.jessemitchell.popularmovies.app.presentors.MovieListPresenter;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,14 +35,28 @@ import java.util.List;
  * https://square.github.io/retrofit/
  * https://www.androidtutorialpoint.com/networking/retrofit-android-tutorial/
  */
-public class PopularMoviesFragment extends Fragment
+public class PopularMoviesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
 {
 
     private final String LOG_TAG = PopularMoviesFragment.class.getSimpleName();
 
+    private final int LIST_LOADER = 0;
     private String mlistType;
     private MovieListInteractor moviList;
     private ImageAdapter movieDetailsAdapter;
+
+    private GridView gView;
+
+
+    private static final String[] LIST_COLUMNS =
+            {
+                    MovieContract.MovieEntry._ID,
+                    MovieContract.MovieEntry.COLUMN_MOVIE_TITLE,
+                    MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW,
+                    MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE,
+                    MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH,
+                    MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE
+            };
 
     @Override
     public void onStart()
@@ -45,8 +64,18 @@ public class PopularMoviesFragment extends Fragment
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mlistType = sharedPrefs.getString(getString(R.string.pref_list_key),getString(R.string.pref_list_default));
         super.onStart();
-        moviList = new MovieListPresenter(this, mlistType);
-        moviList.loadMovieList();
+        if (mlistType.equals("favorites"))
+        {
+            MovieListAdapter mListAdapter = new MovieListAdapter(getContext(),null, 0);
+           
+            gView.setAdapter(mListAdapter);
+        }
+        else
+        {
+            moviList = new MovieListPresenter(this, mlistType);
+            moviList.loadMovieList();
+        }
+
     }
 
     public void addMovies(MovieDetailResults movies)
@@ -64,7 +93,15 @@ public class PopularMoviesFragment extends Fragment
     @Override
     public void onPause() {
         super.onPause();
-        moviList.unSubscribeMovieList();
+        if (!mlistType.equals("favorites"))
+            moviList.unSubscribeMovieList();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        getLoaderManager().initLoader(LIST_LOADER, null, this);
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -73,7 +110,7 @@ public class PopularMoviesFragment extends Fragment
         View rootView = inflater.inflate(R.layout.movies_main, container, false);
         movieDetailsAdapter = new  ImageAdapter(this.getContext(), new ArrayList<MovieDetailResults.MovieDetail>());
 
-        GridView gView = (GridView)rootView.findViewById(R.id.movies_grid_view);
+        gView = (GridView)rootView.findViewById(R.id.movies_grid_view);
         gView.setAdapter(movieDetailsAdapter);
 
         gView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
@@ -89,37 +126,28 @@ public class PopularMoviesFragment extends Fragment
         return rootView;
     }
 
-    // Used https://github.com/udacity/android-custom-arrayadapter as a guide to builde the adapter
-    public class ImageAdapter extends ArrayAdapter<MovieDetailResults.MovieDetail>
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        gView.setAdapter(movieDetailsAdapter);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args)
     {
-        private final String LOG_TAG = ImageAdapter.class.getSimpleName();
+        String sortOrder = MovieContract.MovieEntry.COLUMN_MOVIE_TITLE + " ASC";
+        Uri movieList = MovieContract.MovieEntry.CONTENT_URI;
 
-        public ImageAdapter(Context context, List<MovieDetailResults.MovieDetail> movieDetails)
-        {
-            super(context, 0, movieDetails);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            MovieDetailResults.MovieDetail details = getItem(position);
-
-            ImageView imageView;
-            if (convertView == null) {
-                // if it's not recycled, initialize some attributes
-                imageView = new ImageView(getContext());
-                imageView.setLayoutParams(
-                        new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                                  ViewGroup.LayoutParams.WRAP_CONTENT));
-                imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                imageView.setAdjustViewBounds(true);
-                imageView.setPadding(10, 10, 10, 10);
-            } else {
-                imageView = (ImageView) convertView;
-            }
-
-            Picasso.with(parent.getContext()).load(details.getPosterPath()).into(imageView);
-            return imageView;
-        }
+        return new CursorLoader(getContext(),
+                movieList,
+                LIST_COLUMNS,
+                MovieContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE,
+                new String[]{mlistType},
+                sortOrder);
     }
 }

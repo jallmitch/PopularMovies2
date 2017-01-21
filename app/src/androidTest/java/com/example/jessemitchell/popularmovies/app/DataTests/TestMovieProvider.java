@@ -149,8 +149,9 @@ public class TestMovieProvider extends AndroidTestCase
         String videoTableName = MovieContract.VideoEntry.TABLE_NAME;
 
         // Remove previous data
-        mContext.getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, null, null);
         mContext.getContentResolver().delete(MovieContract.VideoEntry.CONTENT_URI, null, null);
+        mContext.getContentResolver().delete(MovieContract.ReviewEntry.CONTENT_URI, null, null);
+        mContext.getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, null, null);
 
         ContentValues movieContent = TestUtilities.buildMovieValues();
         long movieId = insertEntryData(movieDbHelper, movieTableName, movieContent);

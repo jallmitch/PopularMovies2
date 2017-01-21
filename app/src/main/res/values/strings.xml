@@ -32,10 +32,12 @@
     <string-array name="pref_movie_lists">
         <item>Popular</item>
         <item>Top Rated</item>
+        <item>Favorites</item>
     </string-array>
     <string-array name="pref_movie_list_values">
         <item>popular</item>
         <item>top_rated</item>
+        <item>favorites</item>
     </string-array>
 
 
