@@ -48,18 +48,6 @@ public class TestMovieProvider extends AndroidTestCase
         // content://authority/movie/id
         type = mContext.getContentResolver().getType(MovieContract.MovieEntry.buildMovieUri(TestUtilities.MOVIE_KEY));
         assertEquals("Error: the MovieEntry CONTENT_URI should return MovieEntry.CONTENT_TYPE", MovieContract.MovieEntry.CONTENT_ITEM_TYPE, type);
-
-        // content://authority/movie/id/videos - trailers associated to a video
-        type = mContext.getContentResolver().getType(MovieContract.MovieEntry.buildMovieWithVideosUri(TestUtilities.MOVIE_KEY));
-        assertEquals("Error: the MovieEntry CONTENT_URI should return MovieEntry.CONTENT_TYPE", MovieContract.VideoEntry.CONTENT_TYPE, type);
-
-        // content://authority/video - all videos
-        type = mContext.getContentResolver().getType(MovieContract.VideoEntry.CONTENT_URI);
-        assertEquals("Error: the MovieEntry CONTENT_URI should return MovieEntry.CONTENT_TYPE", MovieContract.VideoEntry.CONTENT_TYPE, type);
-
-        // content://authority/video/id
-        type = mContext.getContentResolver().getType((MovieContract.VideoEntry.buildVideoUri(1)));
-        assertEquals("Error: the MovieEntry CONTENT_URI should return MovieEntry.CONTENT_TYPE", MovieContract.VideoEntry.CONTENT_ITEM_TYPE, type);
     }
 
     public void testBasicMovieCrudOperations()
@@ -100,100 +88,18 @@ public class TestMovieProvider extends AndroidTestCase
 
     }
 
-    public void testBasicVideoCrudOperations()
-    {
-        MovieDbHelper movieDbHelper = new MovieDbHelper(mContext);
-        String movieTableName = MovieContract.MovieEntry.TABLE_NAME;
-        String videoTableName = MovieContract.VideoEntry.TABLE_NAME;
 
-        // Remove previous data
-        mContext.getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, null, null);
-        mContext.getContentResolver().delete(MovieContract.VideoEntry.CONTENT_URI, null, null);
-
-        ContentValues movieContent = TestUtilities.buildMovieValues();
-        insertEntryData(movieDbHelper, movieTableName, movieContent);
-
-        ContentValues content = TestUtilities.buildMovieTrailerValues();
-        long videoId = insertEntryData(movieDbHelper, videoTableName, content);
-
-        Cursor movieCursor = getCursor(MovieContract.VideoEntry.CONTENT_URI);
-
-        assertTrue("Query Failed to return a single result", movieCursor.moveToFirst());
-        TestUtilities.validateCursor("Movie query failed", movieCursor, content);
-
-        movieCursor.close();
-        assertTrue(movieCursor.isClosed());
-
-        ContentValues updateValues = new ContentValues();
-        updateValues.put(MovieContract.VideoEntry.COLUMN_VIDEO_SIZE, 500);
-        updateEntryData(movieDbHelper, videoTableName, updateValues, "_id=?", new String[]{Long.toString(videoId)});
-
-        Cursor updateCursor = getCursor(MovieContract.VideoEntry.CONTENT_URI);
-
-        assertTrue("Query Failed to return a single result", updateCursor.moveToFirst());
-
-        int videoSizeIndex = updateCursor.getColumnIndex(MovieContract.VideoEntry.COLUMN_VIDEO_SIZE);
-        int videoSize = updateCursor.getInt(videoSizeIndex);
-        assertFalse("Values should not match", videoSize == TestUtilities.VIDEO_SIZE);
-
-        updateCursor.close();
-        assertTrue(updateCursor.isClosed());
-
-        assertTrue("Record was not deleted with id:" + videoId, deleteEntryData(movieDbHelper, videoTableName, videoId) == 1);
-    }
 
     public void testQueryMethod()
     {
         MovieDbHelper movieDbHelper = new MovieDbHelper(mContext);
         String movieTableName = MovieContract.MovieEntry.TABLE_NAME;
-        String videoTableName = MovieContract.VideoEntry.TABLE_NAME;
 
-        // Remove previous data
-        mContext.getContentResolver().delete(MovieContract.VideoEntry.CONTENT_URI, null, null);
-        mContext.getContentResolver().delete(MovieContract.ReviewEntry.CONTENT_URI, null, null);
         mContext.getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, null, null);
 
         ContentValues movieContent = TestUtilities.buildMovieValues();
         long movieId = insertEntryData(movieDbHelper, movieTableName, movieContent);
 
-        ContentValues videoContent = TestUtilities.buildMovieTrailerValues();
-        long videoId = insertEntryData(movieDbHelper, videoTableName, videoContent);
-
-        // query all movies
-        Cursor allMovieCursor = getCursor(MovieContract.MovieEntry.CONTENT_URI);
-
-        assertTrue("Query Failed to return a single result", allMovieCursor.moveToFirst());
-        TestUtilities.validateCursor("Movie query failed", allMovieCursor, movieContent);
-        allMovieCursor.close();
-
-        // query all videos
-        Cursor allVideosCursor = getCursor(MovieContract.VideoEntry.CONTENT_URI);
-
-        assertTrue("Query Failed to return a single result", allVideosCursor.moveToFirst());
-        TestUtilities.validateCursor("Movie query failed", allVideosCursor, videoContent);
-        allVideosCursor.close();
-
-        // query single movie
-        Cursor oneVideosCursor = getCursor(MovieContract.VideoEntry.buildVideoUri(videoId));
-
-        assertTrue("Query Failed to return a single result", oneVideosCursor.moveToFirst());
-        TestUtilities.validateCursor("Movie query failed", oneVideosCursor, videoContent);
-        oneVideosCursor.close();
-
-        // query single video
-        Cursor oneMovieCursor = getCursor(MovieContract.MovieEntry.buildMovieUri(videoId));
-
-        assertTrue("Query Failed to return a single result", oneMovieCursor.moveToFirst());
-        TestUtilities.validateCursor("Movie query failed", oneMovieCursor, movieContent);
-        oneMovieCursor.close();
-
-        // query all videos for a given movie
-        Cursor movieWithVideoCursor =
-                getCursor(MovieContract.MovieEntry.buildMovieWithVideosUri(movieId));
-
-        assertTrue("Query Failed to return a single result", movieWithVideoCursor.moveToFirst());
-        TestUtilities.validateJoinCursor("Movie query failed", movieWithVideoCursor, movieContent, videoContent);
-        movieWithVideoCursor.close();
     }
 
     private Cursor getCursor(Uri uri) {

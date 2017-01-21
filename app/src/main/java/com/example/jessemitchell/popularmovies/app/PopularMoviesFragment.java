@@ -1,11 +1,9 @@
 package com.example.jessemitchell.popularmovies.app;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -67,6 +65,11 @@ public class PopularMoviesFragment extends Fragment implements LoaderManager.Loa
         moviList.loadMovieList();
     }
 
+    public interface Callback
+    {
+        void onItemSelected(MovieDetailResults.MovieDetail movie);
+    }
+
     public void addMovies(MovieDetailResults movies)
     {
         List<MovieDetailResults.MovieDetail> mdResults = movies.getResults();
@@ -106,10 +109,7 @@ public class PopularMoviesFragment extends Fragment implements LoaderManager.Loa
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
             {
-                MovieDetailResults.MovieDetail movie = movieDetailsAdapter.getItem(i);
-                Intent movieDetailIntent = new Intent(getContext(),DisplayMovieDetailsActivity.class);
-                movieDetailIntent.putExtra(getString(R.string.movie_details_data), (Parcelable) movie);
-                startActivity(movieDetailIntent);
+                ((Callback) getActivity()).onItemSelected(movieDetailsAdapter.getItem(i));
             }
         });
         return rootView;
