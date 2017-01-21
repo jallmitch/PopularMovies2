@@ -54,8 +54,6 @@ public class MovieListPresenter implements MovieListInteractor
         this.mListType = listType;
     }
 
-
-
     @Override
     public void loadMovieList()
     {
