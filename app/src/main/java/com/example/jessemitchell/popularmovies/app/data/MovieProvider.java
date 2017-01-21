@@ -23,10 +23,12 @@ public class MovieProvider extends ContentProvider
     static final int MOVIE_ID = 101;
 
     static final int VIDEOS = 200;
-    static final int MOVIE_WITH_VIDEOS = 201;
+    static final int VIDEO_ID = 201;
+    static final int MOVIE_WITH_VIDEOS = 202;
 
     static final int REVIEWS = 300;
-    static final int MOVIE_WITH_REVIEWS = 301;
+    static final int REVIEW_ID = 301;
+    static final int MOVIE_WITH_REVIEWS = 302;
 
     static{
         sMovieJoinVideoQB = new SQLiteQueryBuilder();
@@ -105,12 +107,18 @@ public class MovieProvider extends ContentProvider
         // content://authority/videos
         matcher.addURI(authority, MovieContract.PATH_VIDEO, VIDEOS);
 
+        // content://authority/videos/id
+        matcher.addURI(authority, MovieContract.PATH_VIDEO + "/#", VIDEO_ID);
+
         // content://authority/movie/id/videos - trailers associated to a video
         matcher.addURI(authority, MovieContract.PATH_MOVIE + "/#/" +
                                   MovieContract.PATH_VIDEO, MOVIE_WITH_VIDEOS);
 
         // content://authority/reviews
         matcher.addURI(authority, MovieContract.PATH_REVIEW, REVIEWS);
+
+        // content://authority/reviews/id
+        matcher.addURI(authority, MovieContract.PATH_REVIEW + "/#", REVIEW_ID);
 
         // content://authority/movie/id/reviews - reviews associated to a video
         matcher.addURI(authority, MovieContract.PATH_MOVIE + "/#/" +
@@ -130,6 +138,14 @@ public class MovieProvider extends ContentProvider
                 return MovieContract.MovieEntry.CONTENT_TYPE;
             case MOVIE_ID:
                 return MovieContract.MovieEntry.CONTENT_ITEM_TYPE;
+            case VIDEOS:
+                return MovieContract.VideoEntry.CONTENT_TYPE;
+            case VIDEO_ID:
+                return MovieContract.VideoEntry.CONTENT_ITEM_TYPE;
+            case REVIEWS:
+                return MovieContract.ReviewEntry.CONTENT_TYPE;
+            case REVIEW_ID:
+                return MovieContract.ReviewEntry.CONTENT_ITEM_TYPE;
             case MOVIE_WITH_VIDEOS:
                 return MovieContract.VideoEntry.CONTENT_TYPE;
             case MOVIE_WITH_REVIEWS:

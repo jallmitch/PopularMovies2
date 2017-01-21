@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -95,34 +94,6 @@ public class MovieDetailFragment extends Fragment
             }
             contentResolver.bulkInsert(MovieContract.VideoEntry.CONTENT_URI, vCV);
         }
-
-        verifyData();
-    }
-
-    private void verifyData()
-    {
-        Cursor movieEntries = getContext().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI, null, null, null, null);
-        if (movieEntries.moveToFirst())
-        {
-            int count = movieEntries.getCount();
-        }
-
-        movieEntries.close();
-
-        Cursor reviewEntries = getContext().getContentResolver().query(MovieContract.ReviewEntry.CONTENT_URI, null, null, null, null);
-        if (reviewEntries.moveToFirst())
-        {
-            int count = reviewEntries.getCount();
-        }
-        reviewEntries.close();
-
-
-        Cursor videoEntries = getContext().getContentResolver().query(MovieContract.VideoEntry.CONTENT_URI, null, null, null, null);
-        if (videoEntries.moveToFirst())
-        {
-            int count = videoEntries.getCount();
-        }
-        videoEntries.close();
     }
 
     private ContentValues getMovieContentValues()
