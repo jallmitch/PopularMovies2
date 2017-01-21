@@ -25,6 +25,7 @@ public class MovieDbHelper extends SQLiteOpenHelper
         // SQL for creating the two tables
         final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " + MovieContract.MovieEntry.TABLE_NAME +
                 " (" + MovieContract.MovieEntry._ID + " INTEGER PRIMARY KEY, " +
+                       MovieContract.MovieEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
                        MovieContract.MovieEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
                        MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW + " TEXT NOT NULL, " +
                        MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE + " TEXT NOT NULL, " +
@@ -42,7 +43,7 @@ public class MovieDbHelper extends SQLiteOpenHelper
                        MovieContract.VideoEntry.COLUMN_VIDEO_TYPE + " TEXT NOT NULL, " +
                        MovieContract.VideoEntry.COLUMN_VIDEO_SIZE + " INTEGER NOT NULL, " +
                  " FOREIGN KEY (" + MovieContract.VideoEntry.COLUMN_MOVIES_KEY + ") REFERENCES " +
-                MovieContract.MovieEntry.TABLE_NAME + " (" + MovieContract.MovieEntry._ID + "));";
+                MovieContract.MovieEntry.TABLE_NAME + " (" + MovieContract.MovieEntry.COLUMN_MOVIE_ID + "));";
 
 
         final String SQL_CREATE_REVIEW_TABLE = "CREATE TABLE " + MovieContract.ReviewEntry.TABLE_NAME +
@@ -52,7 +53,7 @@ public class MovieDbHelper extends SQLiteOpenHelper
                 MovieContract.ReviewEntry.COLUMN_REVIEW_AUTHOR + " TEXT NOT NULL, " +
                 MovieContract.ReviewEntry.COLUMN_REVIEW_CONTENT + " TEXT NOT NULL, " +
                 " FOREIGN KEY (" + MovieContract.ReviewEntry.COLUMN_MOVIES_KEY + ") REFERENCES " +
-                MovieContract.MovieEntry.TABLE_NAME + " (" + MovieContract.MovieEntry._ID + "));";
+                MovieContract.MovieEntry.TABLE_NAME + " (" + MovieContract.MovieEntry.COLUMN_MOVIE_ID + "));";
 
         db.execSQL(SQL_CREATE_MOVIE_TABLE);
         db.execSQL(SQL_CREATE_VIDEO_TABLE);

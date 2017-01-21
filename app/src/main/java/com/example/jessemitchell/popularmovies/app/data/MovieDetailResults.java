@@ -133,11 +133,7 @@ public class MovieDetailResults
 
         public String getPosterPath()
         {
-            StringBuilder sb = new StringBuilder("http://image.tmdb.org/t/p/")
-                    .append("w185")
-                    .append(this.posterPath);
-
-            return sb.toString();
+            return posterPath;
         }
 
         public void setPosterPath(String posterPath) {

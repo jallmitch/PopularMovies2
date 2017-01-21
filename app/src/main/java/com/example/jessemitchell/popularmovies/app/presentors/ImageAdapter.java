@@ -45,7 +45,16 @@ public class ImageAdapter extends ArrayAdapter<MovieDetailResults.MovieDetail>
             imageView = (ImageView) convertView;
         }
 
-        Picasso.with(parent.getContext()).load(details.getPosterPath()).into(imageView);
+        Picasso.with(parent.getContext()).load(buildPosterPath(details.getPosterPath())).into(imageView);
         return imageView;
+    }
+
+    private String buildPosterPath(String imageKey)
+    {
+        StringBuilder sb = new StringBuilder("http://image.tmdb.org/t/p/")
+                .append("w185")
+                .append(imageKey);
+
+        return sb.toString();
     }
 }
