@@ -159,6 +159,28 @@ public class MovieProvider extends ContentProvider
                                                null);
                 break;
             }
+            case VIDEOS: {
+                returnCursor = mMovieDb.getReadableDatabase()
+                        .query(MovieContract.VideoEntry.TABLE_NAME,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null);
+                break;
+            }
+            case REVIEWS: {
+                returnCursor = mMovieDb.getReadableDatabase()
+                        .query(MovieContract.ReviewEntry.TABLE_NAME,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null);
+                break;
+            }
             case MOVIE_ID:
             {
                 returnCursor = mMovieDb.getReadableDatabase()
@@ -299,8 +321,40 @@ public class MovieProvider extends ContentProvider
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
-        return super.bulkInsert(uri, values);
+    public int bulkInsert(Uri uri, ContentValues[] values)
+    {
+        final int match = sUriMatcher.match(uri);
+        switch (match)
+        {
+            case VIDEOS:
+                return doTransactions(uri, MovieContract.VideoEntry.TABLE_NAME, values);
+
+            case REVIEWS:
+                return doTransactions(uri, MovieContract.ReviewEntry.TABLE_NAME, values);
+            default:
+                return super.bulkInsert(uri, values);
+        }
+    }
+
+    private int doTransactions(Uri uri, String tableName, ContentValues[] values)
+    {
+        final SQLiteDatabase db = mMovieDb.getWritableDatabase();
+        db.beginTransaction();
+        int returnCount = 0;
+        try {
+            for (ContentValues value : values) {
+                long _id = db.insert(tableName, null, value);
+                if (_id != -1) {
+                    returnCount++;
+                }
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return returnCount;
+
     }
 
     @Override
