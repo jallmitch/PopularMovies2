@@ -1,8 +1,12 @@
 package com.example.jessemitchell.popularmovies.app;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -19,6 +23,8 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.jessemitchell.popularmovies.app.data.MovieContract;
+import com.example.jessemitchell.popularmovies.app.data.MovieDbHelper;
 import com.example.jessemitchell.popularmovies.app.data.MovieDetailResults;
 import com.example.jessemitchell.popularmovies.app.data.NetworkService;
 import com.example.jessemitchell.popularmovies.app.data.ReviewDetailResults;
@@ -59,6 +65,106 @@ public class MovieDetailFragment extends Fragment
         loadData();
     }
 
+    private void addFavorite()
+    {
+        MovieDbHelper helper = new MovieDbHelper(getContext());
+        ContentResolver contentResolver = getContext().getContentResolver();
+
+        ContentValues mCV = getMovieContentValues();
+        SQLiteDatabase db = helper.getWritableDatabase();
+        long movieId = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, mCV);
+        db.close();
+
+
+        int count = 0;
+        if (reviewResults.size() > 0) {
+            ContentValues[] rCV = new ContentValues[reviewResults.size()];
+            for (ReviewDetailResults.ReviewDetail review : reviewResults) {
+
+                rCV[count] = getReviewContentValues(review, movieId);
+            }
+            contentResolver.bulkInsert(MovieContract.ReviewEntry.CONTENT_URI, rCV);
+        }
+
+        if (trailerResults.size() > 0) {
+            ContentValues[] vCV = new ContentValues[trailerResults.size()];
+            count = 0;
+            for (VideoDetailResults.VideoDetail trailer : trailerResults) {
+
+                vCV[count] = getVideoContentValues(trailer, movieId);
+            }
+            contentResolver.bulkInsert(MovieContract.VideoEntry.CONTENT_URI, vCV);
+        }
+
+        verifyData();
+    }
+
+    private void verifyData()
+    {
+        Cursor movieEntries = getContext().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI, null, null, null, null);
+        if (movieEntries.moveToFirst())
+        {
+            int count = movieEntries.getCount();
+        }
+
+        movieEntries.close();
+
+        Cursor reviewEntries = getContext().getContentResolver().query(MovieContract.ReviewEntry.CONTENT_URI, null, null, null, null);
+        if (reviewEntries.moveToFirst())
+        {
+            int count = reviewEntries.getCount();
+        }
+        reviewEntries.close();
+
+
+        Cursor videoEntries = getContext().getContentResolver().query(MovieContract.VideoEntry.CONTENT_URI, null, null, null, null);
+        if (videoEntries.moveToFirst())
+        {
+            int count = videoEntries.getCount();
+        }
+        videoEntries.close();
+    }
+
+    private ContentValues getMovieContentValues()
+    {
+        ContentValues cv = new ContentValues();
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, movie.getTitle());
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, movie.getOverview());
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, movie.getReleaseDate());
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, movie.getPosterPath());
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, movie.getVoteAverage());
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE, "FAVORITE");
+        return cv;
+    }
+
+    private ContentValues getVideoContentValues(VideoDetailResults.VideoDetail video, long movieId)
+    {
+        ContentValues cv = new ContentValues();
+        cv.put(MovieContract.VideoEntry.COLUMN_MOVIES_KEY, movieId);
+        cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_ID, video.getId());
+        cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_NAME, video.getName());
+        cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_SITE, video.getSite());
+        cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_SITE_KEY, video.getKey());
+        cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_SIZE, video.getSize());
+        cv.put(MovieContract.VideoEntry.COLUMN_VIDEO_TYPE, video.getType());
+        return cv;
+    }
+
+    private ContentValues getReviewContentValues(ReviewDetailResults.ReviewDetail review, long movieId)
+    {
+        ContentValues cv = new ContentValues();
+        cv.put(MovieContract.ReviewEntry.COLUMN_MOVIES_KEY, movieId);
+        cv.put(MovieContract.ReviewEntry.COLUMN_REVIEW_ID, review.getId());
+        cv.put(MovieContract.ReviewEntry.COLUMN_REVIEW_AUTHOR, review.getAuthor());
+        cv.put(MovieContract.ReviewEntry.COLUMN_REVIEW_CONTENT, review.getContent());
+        return cv;
+    }
+
+    private void removeFavorite()
+    {
+
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
@@ -79,8 +185,10 @@ public class MovieDetailFragment extends Fragment
                 @Override
                 public void onClick(View v)
                 {
-//                        addToFavorites();
-                    Toast.makeText(getContext(),"You have selected this movie as your favorite", Toast.LENGTH_SHORT).show();
+                    if (chBox.isChecked())
+                        addFavorite();
+                    else
+                        removeFavorite();
                 }
             });
 
