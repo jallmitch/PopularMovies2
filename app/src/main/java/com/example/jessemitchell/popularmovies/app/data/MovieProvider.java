@@ -36,7 +36,7 @@ public class MovieProvider extends ContentProvider
                 MovieContract.MovieEntry.TABLE_NAME +  " INNER JOIN " +
                         MovieContract.VideoEntry.TABLE_NAME +
                         " ON " + MovieContract.MovieEntry.TABLE_NAME +
-                        "." + MovieContract.MovieEntry._ID +
+                        "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID +
                         "=" + MovieContract.VideoEntry.TABLE_NAME +
                         "." + MovieContract.VideoEntry.COLUMN_MOVIES_KEY
         );
@@ -46,7 +46,7 @@ public class MovieProvider extends ContentProvider
                 MovieContract.MovieEntry.TABLE_NAME +  " INNER JOIN " +
                         MovieContract.ReviewEntry.TABLE_NAME +
                         " ON " + MovieContract.MovieEntry.TABLE_NAME +
-                        "." + MovieContract.MovieEntry._ID +
+                        "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID +
                         "=" + MovieContract.ReviewEntry.TABLE_NAME +
                         "." + MovieContract.ReviewEntry.COLUMN_MOVIES_KEY
         );
@@ -313,6 +313,11 @@ public class MovieProvider extends ContentProvider
         switch (uriMatch)
         {
             case MOVIES:
+            {
+                deletedRow = db.delete(MovieContract.MovieEntry.TABLE_NAME,selection, selectionArgs);
+                break;
+            }
+            case MOVIE_ID:
             {
                 deletedRow = db.delete(MovieContract.MovieEntry.TABLE_NAME,selection, selectionArgs);
                 break;

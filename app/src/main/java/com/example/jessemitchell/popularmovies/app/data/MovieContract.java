@@ -36,6 +36,8 @@ public class MovieContract
 
         public static final String TABLE_NAME = "movies";
 
+        public static final String COLUMN_MOVIE_ID = "movie_id";
+
         // Title of the movie
         public static final String COLUMN_MOVIE_TITLE = "title";
 
@@ -92,7 +94,7 @@ public class MovieContract
         public static final String COLUMN_VIDEO_ID = "video_id";
 
         // Foreign Key to tie the videos to the movie
-        public static final String COLUMN_MOVIES_KEY = "movies_key";
+        public static final String COLUMN_MOVIES_KEY = "movies_id";
 
         // Name of the video
         public static final String COLUMN_VIDEO_NAME = "name";
@@ -133,7 +135,7 @@ public class MovieContract
         public static final String TABLE_NAME = "reviews";
 
         // Foreign key to tie the review to the movie
-        public static final String COLUMN_MOVIES_KEY = "movies_key";
+        public static final String COLUMN_MOVIES_KEY = "movie_id";
 
         // API returns a UUID string, storing as text
         public static final String COLUMN_REVIEW_ID = "review_id";

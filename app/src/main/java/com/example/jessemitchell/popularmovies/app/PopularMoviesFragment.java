@@ -21,7 +21,6 @@ import android.widget.GridView;
 import com.example.jessemitchell.popularmovies.app.data.MovieContract;
 import com.example.jessemitchell.popularmovies.app.data.MovieDetailResults;
 import com.example.jessemitchell.popularmovies.app.presentors.ImageAdapter;
-import com.example.jessemitchell.popularmovies.app.presentors.MovieListAdapter;
 import com.example.jessemitchell.popularmovies.app.presentors.MovieListInteractor;
 import com.example.jessemitchell.popularmovies.app.presentors.MovieListPresenter;
 
@@ -64,18 +63,8 @@ public class PopularMoviesFragment extends Fragment implements LoaderManager.Loa
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mlistType = sharedPrefs.getString(getString(R.string.pref_list_key),getString(R.string.pref_list_default));
         super.onStart();
-        if (mlistType.equals("favorites"))
-        {
-            MovieListAdapter mListAdapter = new MovieListAdapter(getContext(),null, 0);
-           
-            gView.setAdapter(mListAdapter);
-        }
-        else
-        {
-            moviList = new MovieListPresenter(this, mlistType);
-            moviList.loadMovieList();
-        }
-
+        moviList = new MovieListPresenter(this, mlistType);
+        moviList.loadMovieList();
     }
 
     public void addMovies(MovieDetailResults movies)
