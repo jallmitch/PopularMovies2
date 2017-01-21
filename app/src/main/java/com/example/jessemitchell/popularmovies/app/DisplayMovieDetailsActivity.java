@@ -15,7 +15,12 @@ public class DisplayMovieDetailsActivity extends AppCompatActivity {
 
         if (savedInstanceState == null)
         {
-            getSupportFragmentManager().beginTransaction().add(R.id.activity_display_movie_details, new MovieDetailFragment()).commit();
+            Bundle args = new Bundle();
+            args.putParcelable(MovieDetailFragment.MOVIE_DETAIL_URI, getIntent().getData());
+            MovieDetailFragment frag = new MovieDetailFragment();
+            frag.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction().add(R.id.moive_detail_container, frag).commit();
         }
     }
 

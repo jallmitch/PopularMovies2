@@ -53,13 +53,16 @@ public class MovieDetailFragment extends Fragment
     private MovieDetailsInteractor detailsInteractor;
     private List<ReviewDetailResults.ReviewDetail> reviewResults;
     private List<VideoDetailResults.VideoDetail> trailerResults;
-
+    static final String MOVIE_DETAIL_URI = "URI";
 
     private final int TRAILERS = 0;
     private final int REVIEWS = 1;
 
     private MovieDetailResults.MovieDetail movie;
 
+    public MovieDetailFragment()
+    {
+    }
 
     @Override
     public void onStart() {
@@ -70,7 +73,6 @@ public class MovieDetailFragment extends Fragment
     private void addFavorite(String title)
     {
         MovieDbHelper helper = new MovieDbHelper(getContext());
-        ContentResolver contentResolver = getContext().getContentResolver();
 
         ContentValues mCV = getMovieContentValues();
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -109,13 +111,17 @@ public class MovieDetailFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
+        Bundle args = getArguments();
+        if(args != null) {
+            movie = getArguments().getParcelable(MovieDetailFragment.MOVIE_DETAIL_URI);
+        }
+        
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String mlistType = sharedPrefs.getString(getString(R.string.pref_list_key),getString(R.string.pref_list_default));
         Intent intent = getActivity().getIntent();
         String movieDetailData = getString(R.string.movie_details_data);
         View rootView = inflater.inflate(R.layout.movie_detail_main,container,false);
         PackageManager packageManager = getActivity().getPackageManager();
-        service = new RxApplication().getNetorkService();
 
 
         if(intent != null && intent.hasExtra(movieDetailData))
@@ -238,11 +244,12 @@ public class MovieDetailFragment extends Fragment
     {
         groupHeaders =new ArrayList<>();
 
+        service = new RxApplication().getNetorkService();
         groupHeaders.add(0, "Trailers");
         groupHeaders.add(1, "Reviews");
         listChildren = new HashMap<>();
 
-        detailsInteractor = new MovieDetailsPresenter(this, service, movie.getId());
+        detailsInteractor = new MovieDetailsPresenter(this, service, 328111);
         detailsInteractor.loadMovieReviews();
     }
 
