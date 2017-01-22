@@ -109,25 +109,26 @@ public class MovieDetailFragment extends Fragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
+    {
+        View rootView = inflater.inflate(R.layout.movie_detail_main,container,false);
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String mlistType = sharedPrefs.getString(getString(R.string.pref_list_key),getString(R.string.pref_list_default));
+        String movieDetailData = getString(R.string.movie_details_data);
 
         Bundle args = getArguments();
         if(args != null) {
             movie = getArguments().getParcelable(MovieDetailFragment.MOVIE_DETAIL_URI);
         }
-        
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String mlistType = sharedPrefs.getString(getString(R.string.pref_list_key),getString(R.string.pref_list_default));
-        Intent intent = getActivity().getIntent();
-        String movieDetailData = getString(R.string.movie_details_data);
-        View rootView = inflater.inflate(R.layout.movie_detail_main,container,false);
-        PackageManager packageManager = getActivity().getPackageManager();
-
-
-        if(intent != null && intent.hasExtra(movieDetailData))
+        if (movie == null)
         {
+            Intent intent = getActivity().getIntent();
             movie = intent.getParcelableExtra(movieDetailData);
+        }
 
+        if (movie != null)
+        {
+            PackageManager packageManager = getActivity().getPackageManager();
 
             CheckBox chBox = (CheckBox)rootView.findViewById(R.id.checkbox_favorite);
             chBox.setOnClickListener(new View.OnClickListener() {

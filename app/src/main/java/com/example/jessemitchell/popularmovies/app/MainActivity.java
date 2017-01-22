@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesFrag
             Bundle args = new Bundle();
             args.putParcelable(MovieDetailFragment.MOVIE_DETAIL_URI, movie);
             MovieDetailFragment frag = new MovieDetailFragment();
+            frag.setArguments(args);
 
             getSupportFragmentManager().beginTransaction().replace(R.id.moive_detail_container, frag, DETAILFRAGMENT_TAG).commit();
         }
