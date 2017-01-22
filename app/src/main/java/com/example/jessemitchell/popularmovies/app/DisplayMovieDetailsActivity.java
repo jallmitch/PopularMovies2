@@ -17,6 +17,7 @@ public class DisplayMovieDetailsActivity extends AppCompatActivity {
         {
             Bundle args = new Bundle();
             args.putParcelable(MovieDetailFragment.MOVIE_DETAIL_URI, getIntent().getData());
+
             MovieDetailFragment frag = new MovieDetailFragment();
             frag.setArguments(args);
 
