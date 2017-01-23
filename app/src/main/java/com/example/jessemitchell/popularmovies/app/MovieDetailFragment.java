@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -150,7 +149,7 @@ public class MovieDetailFragment extends Fragment
 
             // Set Voter Average
             ((RatingBar)rootView.findViewById(R.id.vote_average_bar)).setNumStars(5);
-            ((RatingBar)rootView.findViewById(R.id.vote_average_bar)).setRating(movie.getVoteAverage().floatValue());
+            ((RatingBar)rootView.findViewById(R.id.vote_average_bar)).setRating(calculateVoterAverage(movie.getVoteAverage()));
 
             // Change Image Size and display
             ImageView imageView = (ImageView)rootView.findViewById(R.id.movie_image_view);
@@ -164,8 +163,8 @@ public class MovieDetailFragment extends Fragment
             // Set Overview text.
             // setMovementMethod http://stackoverflow.com/questions/1748977/making-textview-scrollable-in-android
             ((TextView)rootView.findViewById(R.id.overview_text_view)).setText(movie.getOverview());
-            ((TextView)rootView.findViewById(R.id.overview_text_view))
-                    .setMovementMethod(new ScrollingMovementMethod());
+//            ((TextView)rootView.findViewById(R.id.overview_text_view))
+//                    .setMovementMethod(new ScrollingMovementMethod());
 
             ExpandableListView exListView = (ExpandableListView) rootView.findViewById(R.id.detail_expand_view);
             exListAdapter = new ExpandableListAdapter(getContext(),  new ArrayList<>(), new HashMap<String, List<String>>());
@@ -273,6 +272,11 @@ public class MovieDetailFragment extends Fragment
 
         exListAdapter.setReviewData(reviews);
         exListAdapter.setTrailerData(trailers);
+    }
+
+    private float calculateVoterAverage(double average)
+    {
+        return (float)average/2;
     }
 
     private String buildPosterPath(String imageKey)
