@@ -242,7 +242,7 @@ public class MovieDetailResults
         }
 
         public void setVoteAverage(Double voteAverage) {
-            this.voteAverage = voteAverage/2;
+            this.voteAverage = voteAverage;
         }
 
         @Override
