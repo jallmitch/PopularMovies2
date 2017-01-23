@@ -160,11 +160,7 @@ public class MovieDetailFragment extends Fragment
             // Set Release Date
             ((TextView)rootView.findViewById(R.id.date_text_view)).setText(movie.getReleaseDate());
 
-            // Set Overview text.
-            // setMovementMethod http://stackoverflow.com/questions/1748977/making-textview-scrollable-in-android
             ((TextView)rootView.findViewById(R.id.overview_text_view)).setText(movie.getOverview());
-//            ((TextView)rootView.findViewById(R.id.overview_text_view))
-//                    .setMovementMethod(new ScrollingMovementMethod());
 
             ExpandableListView exListView = (ExpandableListView) rootView.findViewById(R.id.detail_expand_view);
             exListAdapter = new ExpandableListAdapter(getContext(),  new ArrayList<>(), new HashMap<String, List<String>>());
