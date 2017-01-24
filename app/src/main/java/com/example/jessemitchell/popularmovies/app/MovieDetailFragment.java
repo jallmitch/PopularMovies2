@@ -59,52 +59,16 @@ public class MovieDetailFragment extends Fragment
 
     private MovieDetailResults.MovieDetail movie;
 
-    public MovieDetailFragment()
-    {
-    }
-
     @Override
     public void onStart() {
         super.onStart();
         loadData();
     }
 
-    private void addFavorite(String title)
-    {
-        MovieDbHelper helper = new MovieDbHelper(getContext());
-
-        ContentValues mCV = getMovieContentValues();
-        SQLiteDatabase db = helper.getWritableDatabase();
-        long movieId = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, mCV);
-
-        if (movieId != 0)
-            Toast.makeText(getContext(), title +  " was added to your Favorites list.",Toast.LENGTH_SHORT).show();
-
-        db.close();
-    }
-
-    private ContentValues getMovieContentValues()
-    {
-        ContentValues cv = new ContentValues();
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie.getId());
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, movie.getTitle());
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, movie.getOverview());
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, movie.getReleaseDate());
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, movie.getPosterPath());
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, movie.getVoteAverage());
-        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE, "FAVORITE");
-        return cv;
-    }
-
-    private void removeFavorite(String title, int movieId)
-    {
-        ContentResolver cr = getContext().getContentResolver();
-        int delete = cr.delete(MovieContract.MovieEntry.buildMovieUri(movieId),
-                MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?",
-                new String[]{Integer.toString(movieId)});
-
-        if (delete != 0)
-            Toast.makeText(getContext(), title +  " was removed to your Favorites list.",Toast.LENGTH_SHORT).show();
+    @Override
+    public void onPause() {
+        detailsInteractor.unSubscribeMovieReviews();
+        super.onPause();
     }
 
     @Override
@@ -230,12 +194,6 @@ public class MovieDetailFragment extends Fragment
         return rootView;
     }
 
-    @Override
-    public void onPause() {
-        detailsInteractor.unSubscribeMovieReviews();
-        super.onPause();
-    }
-
     private void loadData()
     {
         groupHeaders =new ArrayList<>();
@@ -268,6 +226,44 @@ public class MovieDetailFragment extends Fragment
 
         exListAdapter.setReviewData(reviews);
         exListAdapter.setTrailerData(trailers);
+    }
+
+    private void addFavorite(String title)
+    {
+        MovieDbHelper helper = new MovieDbHelper(getContext());
+
+        ContentValues mCV = getMovieContentValues();
+        SQLiteDatabase db = helper.getWritableDatabase();
+        long movieId = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, mCV);
+
+        if (movieId != 0)
+            Toast.makeText(getContext(), title +  " was added to your Favorites list.",Toast.LENGTH_SHORT).show();
+
+        db.close();
+    }
+
+    private ContentValues getMovieContentValues()
+    {
+        ContentValues cv = new ContentValues();
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie.getId());
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, movie.getTitle());
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, movie.getOverview());
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, movie.getReleaseDate());
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, movie.getPosterPath());
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, movie.getVoteAverage());
+        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE, "FAVORITE");
+        return cv;
+    }
+
+    private void removeFavorite(String title, int movieId)
+    {
+        ContentResolver cr = getContext().getContentResolver();
+        int delete = cr.delete(MovieContract.MovieEntry.buildMovieUri(movieId),
+                MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?",
+                new String[]{Integer.toString(movieId)});
+
+        if (delete != 0)
+            Toast.makeText(getContext(), title +  " was removed to your Favorites list.",Toast.LENGTH_SHORT).show();
     }
 
     private float calculateVoterAverage(double average)
