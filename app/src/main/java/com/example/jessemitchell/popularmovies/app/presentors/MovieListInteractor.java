@@ -7,5 +7,6 @@ package com.example.jessemitchell.popularmovies.app.presentors;
 public interface MovieListInteractor
 {
     void loadMovieList();
+    void setListType(String listType);
     void unSubscribeMovieList();
 }

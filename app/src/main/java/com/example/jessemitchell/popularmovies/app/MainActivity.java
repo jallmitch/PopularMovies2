@@ -24,6 +24,11 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesFrag
 
         if (findViewById(R.id.moive_detail_container) != null)
         {
+            Bundle args = new Bundle();
+            args.putString(PopularMoviesFragment.LAYOUT_MANAGER_KEY, "twoPayne");
+            PopularMoviesFragment frag = new PopularMoviesFragment();
+            frag.setArguments(args);
+
             mTwoPane = true;
 
             if (savedInstanceState == null)
@@ -81,31 +86,25 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesFrag
     @Override
     protected void onPause() {
         super.onPause();
-        Log.v(LOG_TAG, "on pause");
     }
 
     @Override
     protected void onStop() {
-
-        Log.v(LOG_TAG, "on stop");
         super.onStop();
     }
 
     @Override
     protected void onResume() {
-        Log.v(LOG_TAG, "on resume");
         super.onResume();
     }
 
     @Override
     protected void onStart() {
-        Log.v(LOG_TAG, "on start");
         super.onStart();
     }
 
     @Override
     protected void onDestroy() {
-        Log.v(LOG_TAG, "on destroy");
         super.onDestroy();
     }
 }

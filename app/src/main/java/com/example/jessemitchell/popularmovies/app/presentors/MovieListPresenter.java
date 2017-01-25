@@ -55,6 +55,11 @@ public class MovieListPresenter implements MovieListInteractor
     }
 
     @Override
+    public void setListType(String listType) {
+        this.mListType = listType;
+    }
+
+    @Override
     public void loadMovieList()
     {
         if(mListType.equals("favorites"))

@@ -14,6 +14,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,8 +40,10 @@ public class PopularMoviesFragment extends Fragment implements LoaderManager.Loa
     private final String LOG_TAG = PopularMoviesFragment.class.getSimpleName();
 
     private final int LIST_LOADER = 0;
-    private final String LAYOUT_MANAGER_KEY = "layoutmanager";
+    public static final String LAYOUT_MANAGER_KEY = "layoutmanager";
     private final String KEY_RECYCLER_STATE = "movieRecycler";
+    private final String KEY_MOVIE_ARRAY = "movieList";
+    private final String KEY_LIST_TYPE = "movieListType";
     private final String TAG = "RecyclerViewFragment";
 
     private String mlistType;
@@ -50,8 +53,6 @@ public class PopularMoviesFragment extends Fragment implements LoaderManager.Loa
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
     private Parcelable stateParcelable;
-    private Bundle mBundleState;
-    int currentPosition = 0;
 
     private static final String[] LIST_COLUMNS =
             {
@@ -67,25 +68,46 @@ public class PopularMoviesFragment extends Fragment implements LoaderManager.Loa
     public void onStart()
     {
         super.onStart();
-        if (mMovies.size() == 0)
-            moviList.loadMovieList();;
+
+        Log.d("Start", "Starting the Fragment: " + mMovies.size());
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String mType = sharedPrefs.getString(getString(R.string.pref_list_key),getString(R.string.pref_list_default));
+
+        if (!mlistType.equals(mType))
+        {
+            mlistType = mType;
+            moviList = new MovieListPresenter(this, mlistType);
+            mMovies = new ArrayList<>();
+            getLoaderManager().initLoader(LIST_LOADER, null, this);
+        }
+
+        if (mMovies.size() == 0) {
+            moviList.loadMovieList();
+        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        stateParcelable = mLinearLayoutManager.onSaveInstanceState();
+        Log.d("SaveInstanceState", "Saving the instance state");
+        stateParcelable = mRecyclerView.getLayoutManager().onSaveInstanceState();
         outState.putParcelable(KEY_RECYCLER_STATE, stateParcelable);
+        outState.putParcelableArrayList(KEY_MOVIE_ARRAY, mMovies);
+        outState.putString(KEY_LIST_TYPE, mlistType);
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
 
-        if (savedInstanceState != null ) {
+        Log.d("ViewStateRestored", "Restoring the view");
+        if (savedInstanceState != null)
+        {
             stateParcelable = savedInstanceState.getParcelable(KEY_RECYCLER_STATE);
-            mLinearLayoutManager.onRestoreInstanceState(stateParcelable);
+            ArrayList<MovieDetailResults.MovieDetail> parcelableArrayList = savedInstanceState.getParcelableArrayList(KEY_MOVIE_ARRAY);
+            mMovies.addAll(parcelableArrayList);
         }
     }
 
@@ -93,6 +115,8 @@ public class PopularMoviesFragment extends Fragment implements LoaderManager.Loa
     public void onResume() {
         super.onResume();
 
+        mRecyclerView.getLayoutManager().onRestoreInstanceState(stateParcelable);
+        Log.d("RESUME", "calling on resume:" + mMovies.size());
     }
 
     @Override
@@ -102,6 +126,7 @@ public class PopularMoviesFragment extends Fragment implements LoaderManager.Loa
         if (!mlistType.equals("favorites"))
             moviList.unSubscribeMovieList();
 
+        Log.d("PAUSE", "calling pause");
     }
 
     public interface Callback
@@ -122,29 +147,36 @@ public class PopularMoviesFragment extends Fragment implements LoaderManager.Loa
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mlistType = sharedPrefs.getString(getString(R.string.pref_list_key),getString(R.string.pref_list_default));
+
+        if (savedInstanceState != null)
+        {
+            mlistType = savedInstanceState.getString(KEY_LIST_TYPE, mlistType);
+        }
+
         moviList = new MovieListPresenter(this, mlistType);
+
         mMovies = new ArrayList<>();
         getLoaderManager().initLoader(LIST_LOADER, null, this);
 
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+
+        Log.d("CreateView", "creating the view.");
         View rootView = inflater.inflate(R.layout.movies_main, container, false);
         rootView.setTag(TAG);
 
-
-        if (rootView.findViewById(R.id.recyclerViewDualPayne) != null)
-        {
-            mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerViewDualPayne);
+        if (rootView.findViewById(R.id.recyclerViewDualPayne) != null) {
+            mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewDualPayne);
             mLinearLayoutManager = new GridLayoutManager(getContext(), 1);
-        }
-        else
-        {
-            mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerView);
+        } else {
+            mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
             mLinearLayoutManager = new GridLayoutManager(getContext(), 3);
         }
+
 
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mMovieAdapter = new RecyclerAdapter(mMovies, new RecyclerAdapter.OnItemClickListener()
@@ -161,12 +193,19 @@ public class PopularMoviesFragment extends Fragment implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data)
     {
+        mMovieAdapter = new RecyclerAdapter(mMovies, new RecyclerAdapter.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(MovieDetailResults.MovieDetail movie) {
+                ((Callback) getActivity()).onItemSelected(movie);
+            }
+        });
         mRecyclerView.setAdapter(mMovieAdapter);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
+    public void onLoaderReset(Loader<Cursor> loader)
+    {
     }
 
     @Override

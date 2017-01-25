@@ -35,6 +35,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MovieH
         mListener = listener;
     }
 
+    public void changeMovies(ArrayList<MovieDetailResults.MovieDetail> movies)
+    {
+        this.mMovies.clear();
+        this.mMovies.addAll(movies);
+    }
+
     @Override
     public RecyclerAdapter.MovieHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
