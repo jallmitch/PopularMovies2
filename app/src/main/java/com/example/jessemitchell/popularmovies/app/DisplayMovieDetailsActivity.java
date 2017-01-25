@@ -8,6 +8,9 @@ import android.view.MenuItem;
 
 public class DisplayMovieDetailsActivity extends AppCompatActivity {
 
+
+    public static final String MOVIE_DETAILS = "movieDetailsActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
