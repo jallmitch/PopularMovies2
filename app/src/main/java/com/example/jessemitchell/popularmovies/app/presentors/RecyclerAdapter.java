@@ -21,7 +21,6 @@ import java.util.ArrayList;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MovieHolder>
 {
-
     public interface OnItemClickListener
     {
         void onItemClick(MovieDetailResults.MovieDetail movie);
