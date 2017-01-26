@@ -203,7 +203,7 @@ public class MovieDetailFragment extends Fragment
         groupHeaders.add(1, "Reviews");
         listChildren = new HashMap<>();
 
-        detailsInteractor = new MovieDetailsPresenter(this, service, 328111);
+        detailsInteractor = new MovieDetailsPresenter(this, service, movie.getId());
         detailsInteractor.loadMovieReviews();
     }
 
